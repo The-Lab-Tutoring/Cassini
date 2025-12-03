@@ -1,6 +1,6 @@
 # Cassini
 
-**Version 1.3.1** - Premium infinite whiteboard with AI assistance, shape tools, and stylus support
+**Version 1.3.2** - Premium infinite whiteboard with AI assistance, shape tools, and stylus support
 
 ## ✨ Features
 
@@ -11,11 +11,21 @@
 - **Text Tool** - Insert formatted text with custom fonts and sizes
 - **Eraser** - Drag to erase with precision
 
+### Export & Import
+
+- **Export Canvas** - Download as PNG with white background (Ctrl+E)
+- **Import Images** - Add images to your whiteboard (Ctrl+I)
+
 ### Navigation & Workspace
 
 - **Infinite Canvas** - Unlimited drawing space beyond the viewport
 - **Pan & Zoom** - Navigate with Select tool or Ctrl+Scroll
 - **Stylus-Only Mode** - Touch pans, stylus/mouse draws
+
+### Keyboard Shortcuts
+
+- **Tools**: P (Pen), E (Eraser), S/V (Select), R (Rectangle), C (Circle), L (Line), A (Arrow)
+- **Undo/Redo**: Ctrl+Z, Ctrl+Y
 
 ### Measurement Tools
 
@@ -59,17 +69,14 @@ Apple "Liquid Glass" aesthetic with glassmorphism effects, smooth animations, an
 - Lucide React Icons
 - Google Gemini API
 
-## 📝 What's New in v1.3
+## 📝 What's New in v1.3.2
 
-- **Shape Tools**: Rectangle, Circle, Line, Arrow
-- **Stylus-Only Mode**: Touch-to-pan, pen-to-draw
-- **Enhanced Selection**: Shape support for all tools
+- **Export Canvas**: Download as PNG
+- **Import Images**: Upload and position images
+- **Keyboard Shortcuts**: Quick tool switching and undo/redo
 
 [View Full Release Notes →](./RELEASE_NOTES.md)
 
 ---
 
 **Built with ❤️ by The Lab Technologies**
-
-**Primary Author:** Google Antigravity /
-**Ideas Director:**  Dutch E.
