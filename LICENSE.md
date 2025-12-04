@@ -1,8 +1,8 @@
 # Cassini License
 
-**Version 1.0 - Effective December 4, 2024**
+**Version 1.0 - Effective December 4, 2025**
 
-Copyright (c) 2024 The Lab Tutoring / The Lab Technologies. All rights reserved.
+Copyright (c) 2025 The Lab Tutoring / The Lab Technologies. All rights reserved.
 
 ---
 
