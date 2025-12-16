@@ -14,6 +14,7 @@ const Whiteboard = () => {
     const [selectedElements, setSelectedElements] = useState([]);
     const [isErasing, setIsErasing] = useState(false);
     const [isPanning, setIsPanning] = useState(false);
+    const [touchCount, setTouchCount] = useState(0); // Track active touches
     const [currentShape, setCurrentShape] = useState(null); // For shape preview
 
     // Image manipulation states
@@ -802,11 +803,11 @@ const Whiteboard = () => {
         e.target.setPointerCapture(e.pointerId);
         const pos = getPointerPos(e);
 
-        // TOUCH INPUT: Force Pan
+        // TOUCH INPUT: Let touch work like mouse for now (no special pan behavior)
+        // Multi-touch gestures can be added in a future update
         if (e.pointerType === 'touch') {
-            setDragOffset({ x: e.clientX, y: e.clientY });
-            setIsPanning(true);
-            return;
+            setTouchCount(prev => prev + 1);
+            // Don't return early - let touch fall through to normal tool handling
         }
 
         // MOUSE/PEN INPUT: Tool Logic
@@ -1135,6 +1136,11 @@ const Whiteboard = () => {
 
     const handlePointerUp = (e) => {
         e.target.releasePointerCapture(e.pointerId);
+
+        // Reset touch count
+        if (e.pointerType === 'touch') {
+            setTouchCount(prev => Math.max(0, prev - 1));
+        }
 
         if (isPanning) {
             setIsPanning(false);

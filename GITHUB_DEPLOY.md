@@ -1,4 +1,4 @@
-# GitHub Deployment Guide for TLT Whiteboard v1.0
+# GitHub Deployment Guide for Cassini Whiteboard
 
 ## Option 1: GitHub Pages (Automated)
 
@@ -21,20 +21,20 @@ Add this to your `"scripts"` section:
 ```bash
 git init
 git add .
-git commit -m "Initial commit - TLT Whiteboard v1.0"
+git commit -m "Initial commit - Cassini Whiteboard"
 ```
 
 ### Step 4: Create GitHub Repository
 
 1. Go to <https://github.com/new>
-2. Name it: `tlt-whiteboard`
+2. Name it: `cassini-whiteboard`
 3. Don't initialize with README (you already have one)
 4. Click "Create repository"
 
 ### Step 5: Connect and Push
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/tlt-whiteboard.git
+git remote add origin https://github.com/YOUR_USERNAME/cassini-whiteboard.git
 git branch -M main
 git push -u origin main
 ```
@@ -45,7 +45,7 @@ git push -u origin main
 npm run deploy
 ```
 
-Your app will be live at: `https://YOUR_USERNAME.github.io/tlt-whiteboard/`
+Your app will be live at: `https://YOUR_USERNAME.github.io/cassini-whiteboard/`
 
 ---
 
@@ -67,7 +67,7 @@ git rm -rf .
 ```bash
 cp -r dist/* .
 git add .
-git commit -m "Deploy v1.0"
+git commit -m "Deploy"
 git push origin gh-pages
 ```
 
@@ -88,8 +88,8 @@ git push origin gh-pages
 ```bash
 git init
 git add .
-git commit -m "TLT Whiteboard v1.0"
-git remote add origin https://github.com/YOUR_USERNAME/tlt-whiteboard.git
+git commit -m "Cassini Whiteboard"
+git remote add origin https://github.com/YOUR_USERNAME/cassini-whiteboard.git
 git push -u origin main
 ```
 
@@ -104,7 +104,7 @@ git push -u origin main
    - Output Directory: `dist`
 5. Click "Deploy"
 
-Your app will be live at: `https://tlt-whiteboard.vercel.app`
+Your app will be live at: `https://cassini-whiteboard.vercel.app`
 
 ---
 
@@ -135,10 +135,10 @@ npm install --save-dev gh-pages
 # 2. Initialize git
 git init
 git add .
-git commit -m "TLT Whiteboard v1.0"
+git commit -m "Cassini Whiteboard"
 
 # 3. Create repo on GitHub, then:
-git remote add origin https://github.com/YOUR_USERNAME/tlt-whiteboard.git
+git remote add origin https://github.com/YOUR_USERNAME/cassini-whiteboard.git
 git push -u origin main
 
 # 4. Deploy to GitHub Pages
@@ -156,6 +156,7 @@ node_modules/
 dist/
 *.log
 .DS_Store
+.env
 ```
 
 Note: We ignore `dist/` in git because it's built automatically during deployment.
@@ -170,7 +171,7 @@ Note: We ignore `dist/` in git because it's built automatically during deploymen
 ```javascript
 export default defineConfig({
   plugins: [react()],
-  base: '/tlt-whiteboard/'  // Add this line with your repo name
+  base: '/cassini-whiteboard/'  // Add this line with your repo name
 })
 ```
 

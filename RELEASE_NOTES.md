@@ -1,5 +1,37 @@
 # Cassini - Release Notes
 
+## Version 1.4.6 - UI Revamp & Orama Branding
+
+**Release Date:** December 16, 2024
+
+### 🚀 New Features
+
+#### Collapsible Toolbar
+
+- ✅ **Collapsible Sections** - Draw, Shapes, Color, Settings panels that expand/collapse
+- ✅ **Cleaner Organization** - Tools grouped logically, reducing visual clutter
+- ✅ **Responsive Sizing** - UI scales based on window size (0.75x - 1x)
+
+#### Responsive Design
+
+- ✅ **Adaptive Layout** - Toolbar adjusts for mobile/tablet/desktop
+- ✅ **Dynamic Icon Sizes** - Scale with viewport width
+- ✅ **Touch Stability** - Fixed touch input handling
+
+### 🔧 Branding Updates
+
+- Updated license and documentation to **Orama** branding
+- "Cassini by Orama" replaces previous TLT/The Lab Tutoring references
+
+### 📦 Files Modified
+
+- **[REWRITE]** `Toolbar.jsx` - Complete redesign with collapsible sections
+- **[UPDATE]** `LICENSE.md` - Orama copyright
+- **[UPDATE]** `DEPLOYMENT.md` - Orama branding
+- **[UPDATE]** `GITHUB_DEPLOY.md` - Orama branding
+
+---
+
 ## Version 1.4.5 - Selection & Alignment Tools
 
 **Release Date:** December 5, 2024

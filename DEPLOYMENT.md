@@ -1,4 +1,4 @@
-# TLT Whiteboard v1.0 - Deployment Guide
+# Cassini Whiteboard - Deployment Guide
 
 ## 📦 What's Included
 
@@ -8,8 +8,8 @@ Your production build is ready in the `dist/` folder:
 dist/
 ├── index.html              # Main HTML file
 ├── assets/
-│   ├── index-BnpiuFv7.css  # Compiled CSS (4.14 KB)
-│   └── index-DjCjGgqI.js   # Compiled JavaScript (164.58 KB)
+│   ├── index-*.css         # Compiled CSS
+│   └── index-*.js          # Compiled JavaScript
 ```
 
 ## 🚀 Deployment Options
@@ -90,7 +90,7 @@ npm run preview
 
 ## 📊 Performance
 
-- **Total Size:** 168.72 KB (53.72 KB gzipped)
+- **Total Size:** ~170 KB (gzipped ~55 KB)
 - **Load Time:** < 1 second on average connection
 - **Lighthouse Score:** 95+ (Performance, Accessibility, Best Practices)
 
@@ -103,13 +103,16 @@ npm run preview
 
 ## 📝 Environment Variables
 
-No environment variables required! The app is fully self-contained.
+Create a `.env` file for the Gemini API key:
+
+```
+VITE_GEMINI_API_KEY=your_api_key_here
+```
 
 ## 🔒 Security Notes
 
 - All assets are bundled and minified
-- No external API calls
-- No user data collection
+- API key should be kept private (use .env)
 - Runs entirely client-side
 
 ## ✅ Pre-Deployment Checklist
@@ -118,7 +121,6 @@ No environment variables required! The app is fully self-contained.
 - [x] All features tested and working
 - [x] README.md created
 - [x] RELEASE_NOTES.md created
-- [x] Version set to 1.0.0
 - [x] No console errors
 - [x] Responsive design verified
 
@@ -134,8 +136,8 @@ Your app will be available at: `https://[random-name].netlify.app`
 
 ## 📞 Support
 
-For issues or questions, contact The Lab Technologies.
+For issues or questions, visit the Orama GitHub repository.
 
 ---
 
-**TLT Whiteboard v1.0** - Ready for production! 🎉
+**Cassini by Orama** - Ready for production! 🎉

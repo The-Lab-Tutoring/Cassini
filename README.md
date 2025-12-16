@@ -100,20 +100,26 @@ Apple "Liquid Glass" aesthetic with glassmorphism effects, smooth animations, an
 - Lucide React Icons
 - Google Gemini API
 
-## 📝 What's New in v1.4.5
+## 📝 What's New in v1.4.6 - UI Revamp
 
-- **Selection Toolbar**: Fixed-position toolbar at bottom-right (no longer blocks elements)
-- **Alignment Tools**: Align left/center/right and top/middle/bottom (2+ elements)
-- **Distribute Evenly**: Space elements horizontally/vertically (3+ elements)
-- **Z-Order Controls**: Bring to front / Send to back
-- **Delete Button**: Moved to selection toolbar with element count
+- **Collapsible Toolbar Sections** - Draw, Shapes, Color, Settings panels that expand/collapse
+- **Responsive UI Scaling** - UI scales based on window size (mobile/tablet/desktop)
+- **Cleaner Organization** - Tools grouped logically, less visual clutter
+- **Orama Branding** - Updated to "Cassini by Orama"
+
+### v1.4.5 - Selection & Alignment Tools
+
+- Selection Toolbar at fixed bottom-right position
+- Alignment Tools: Left/Center/Right, Top/Middle/Bottom
+- Distribute Evenly for 3+ elements
+- Z-Order: Bring to Front / Send to Back
 
 ### v1.4.4 - Text Formatting
 
-- **Bold/Italic/Underline** - Text style toggles
-- **Text Alignment** - Left, Center, Right alignment
-- **Multi-line Text** - Line breaks in text elements
-- **Text Background** - Optional colored background with 8 presets + custom
+- Bold/Italic/Underline text styles
+- Text Alignment (Left, Center, Right)
+- Multi-line Text support
+- Text Background colors
 
 ### v1.4.3b - Image Manipulation
 

@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWhiteboard } from '../context/WhiteboardContext';
 import {
     Pen,
     Eraser,
     MousePointer,
     Ruler,
-    Circle as CircleIcon, // Alias for Protractor
+    Circle as CircleIcon,
     Type,
     Undo,
     Redo,
     Trash2,
     ChevronUp,
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     Square,
     Circle,
     Minus,
@@ -19,7 +21,9 @@ import {
     Download,
     Upload,
     Grid,
-    ArrowLeftRight
+    Palette,
+    Settings2,
+    Shapes
 } from 'lucide-react';
 
 const Toolbar = () => {
@@ -38,19 +42,50 @@ const Toolbar = () => {
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [toolbarOrientation, setToolbarOrientation] = useState('horizontal'); // 'horizontal' or 'vertical'
+    const [toolbarOrientation, setToolbarOrientation] = useState('horizontal');
 
-    const tools = [
+    // Collapsible section states
+    const [showDrawingTools, setShowDrawingTools] = useState(true);
+    const [showShapeTools, setShowShapeTools] = useState(false);
+    const [showColorPanel, setShowColorPanel] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+
+    // Responsive sizing
+    const [uiScale, setUiScale] = useState(1);
+
+    useEffect(() => {
+        const updateScale = () => {
+            const width = window.innerWidth;
+            if (width < 640) setUiScale(0.75);
+            else if (width < 1024) setUiScale(0.9);
+            else setUiScale(1);
+        };
+        updateScale();
+        window.addEventListener('resize', updateScale);
+        return () => window.removeEventListener('resize', updateScale);
+    }, []);
+
+    const baseSize = 40 * uiScale;
+    const iconSize = 20 * uiScale;
+    const smallIconSize = 16 * uiScale;
+
+    const drawingTools = [
         { id: 'pen', icon: Pen, label: 'Pen' },
         { id: 'eraser', icon: Eraser, label: 'Eraser' },
         { id: 'select', icon: MousePointer, label: 'Select' },
+    ];
+
+    const shapeTools = [
         { id: 'rectangle', icon: Square, label: 'Rectangle' },
         { id: 'circle', icon: Circle, label: 'Circle' },
         { id: 'line', icon: Minus, label: 'Line' },
         { id: 'arrow', icon: ArrowRight, label: 'Arrow' },
+        { id: 'text', icon: Type, label: 'Text', action: () => setShowTextModal(true) },
+    ];
+
+    const measureTools = [
         { id: 'ruler', icon: Ruler, label: 'Ruler' },
         { id: 'protractor', icon: CircleIcon, label: 'Protractor' },
-        { id: 'text', icon: Type, label: 'Text', action: () => setShowTextModal(true) }
     ];
 
     const colors = [
@@ -66,6 +101,88 @@ const Toolbar = () => {
         }
     };
 
+    const ToolButton = ({ tool, size = baseSize }) => {
+        const Icon = tool.icon;
+        return (
+            <button
+                className={`glass-button ${activeTool === tool.id ? 'active' : ''}`}
+                onClick={() => handleToolClick(tool)}
+                title={tool.label}
+                style={{
+                    width: size,
+                    height: size,
+                    padding: size * 0.2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+            >
+                <Icon size={iconSize} />
+            </button>
+        );
+    };
+
+    const SectionHeader = ({ label, isOpen, onToggle, icon: Icon }) => (
+        <button
+            className="glass-button"
+            onClick={onToggle}
+            title={`${isOpen ? 'Collapse' : 'Expand'} ${label}`}
+            style={{
+                width: baseSize,
+                height: baseSize * 0.7,
+                padding: '4px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                fontSize: 10 * uiScale,
+                background: isOpen ? 'rgba(0, 122, 255, 0.2)' : 'transparent'
+            }}
+        >
+            <Icon size={smallIconSize} />
+            {isOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        </button>
+    );
+
+    const Divider = () => (
+        <div style={{
+            width: toolbarOrientation === 'horizontal' ? '1px' : '80%',
+            height: toolbarOrientation === 'horizontal' ? baseSize * 0.8 : '1px',
+            background: 'rgba(255, 255, 255, 0.15)',
+            margin: toolbarOrientation === 'horizontal' ? '0 4px' : '4px 0'
+        }} />
+    );
+
+    if (isCollapsed) {
+        return (
+            <div style={{
+                position: 'absolute',
+                top: 20,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 1000
+            }}>
+                <button
+                    className="glass-button"
+                    onClick={() => setIsCollapsed(false)}
+                    title="Expand Toolbar"
+                    style={{
+                        width: baseSize * 1.5,
+                        height: baseSize,
+                        padding: '8px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px'
+                    }}
+                >
+                    <ChevronDown size={iconSize} />
+                    <span style={{ fontSize: 12 * uiScale }}>Tools</span>
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div style={{
             position: 'absolute',
@@ -78,103 +195,70 @@ const Toolbar = () => {
                 left: 20,
                 transform: 'translateY(-50%)'
             }),
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: toolbarOrientation === 'horizontal' ? 'column' : 'row',
-            alignItems: 'center',
-            gap: '8px'
+            zIndex: 1000
         }}>
             <div className="glass" style={{
-                padding: toolbarOrientation === 'horizontal' ? '6px' : '4px',
+                padding: 8 * uiScale,
                 borderRadius: 'var(--radius-lg)',
                 display: 'flex',
                 flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column',
-                gap: toolbarOrientation === 'horizontal' ? '4px' : '2px',
+                gap: 4 * uiScale,
                 alignItems: 'center',
                 transition: 'all 0.3s ease',
+                maxWidth: toolbarOrientation === 'horizontal' ? '95vw' : 'none',
                 maxHeight: toolbarOrientation === 'vertical' ? '90vh' : 'none',
+                overflowX: toolbarOrientation === 'horizontal' ? 'auto' : 'visible',
                 overflowY: toolbarOrientation === 'vertical' ? 'auto' : 'visible'
             }}>
-                {/* Collapse Toggle */}
-                <button
-                    className="glass-button"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    title={isCollapsed ? "Expand Toolbar" : "Collapse Toolbar"}
-                    style={{
-                        width: toolbarOrientation === 'horizontal' ? '28px' : '24px',
-                        height: toolbarOrientation === 'horizontal' ? '28px' : '24px',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: isCollapsed ? 0 : (toolbarOrientation === 'horizontal' ? '5px' : '0')
-                    }}
-                >
-                    {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                </button>
-
-                {/* Orientation Toggle */}
-                {!isCollapsed && (
+                {/* Collapse/Orientation Controls */}
+                <div style={{ display: 'flex', gap: 2 }}>
+                    <button
+                        className="glass-button"
+                        onClick={() => setIsCollapsed(true)}
+                        title="Collapse Toolbar"
+                        style={{ width: baseSize * 0.7, height: baseSize * 0.7, padding: 4 }}
+                    >
+                        <ChevronUp size={smallIconSize} />
+                    </button>
                     <button
                         className="glass-button"
                         onClick={() => setToolbarOrientation(prev => prev === 'horizontal' ? 'vertical' : 'horizontal')}
-                        title={`Switch to ${toolbarOrientation === 'horizontal' ? 'Vertical' : 'Horizontal'}`}
-                        style={{
-                            width: toolbarOrientation === 'horizontal' ? '28px' : '24px',
-                            height: toolbarOrientation === 'horizontal' ? '28px' : '24px',
-                            padding: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: toolbarOrientation === 'horizontal' ? '5px' : '0'
-                        }}
+                        title="Toggle Orientation"
+                        style={{ width: baseSize * 0.7, height: baseSize * 0.7, padding: 4 }}
                     >
-                        <ArrowLeftRight size={16} />
+                        {toolbarOrientation === 'horizontal' ? <ChevronLeft size={smallIconSize} /> : <ChevronRight size={smallIconSize} />}
                     </button>
-                )}
+                </div>
 
-                {!isCollapsed && (
-                    <>
-                        {/* Tool Buttons */}
-                        {tools.map(tool => {
-                            const Icon = tool.icon;
-                            return (
-                                <button
-                                    key={tool.id}
-                                    className={`glass-button ${activeTool === tool.id ? 'active' : ''}`}
-                                    onClick={() => handleToolClick(tool)}
-                                    title={tool.label}
-                                    style={{
-                                        width: toolbarOrientation === 'horizontal' ? '40px' : '28px',
-                                        height: toolbarOrientation === 'horizontal' ? '40px' : '28px',
-                                        padding: toolbarOrientation === 'horizontal' ? '8px' : '5px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                >
-                                    <Icon size={toolbarOrientation === 'horizontal' ? 20 : 14} />
-                                </button>
-                            );
-                        })}
+                <Divider />
 
-                        {/* Divider */}
-                        <div style={{
-                            width: '1px',
-                            height: '40px',
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            margin: '0 4px'
-                        }} />
+                {/* Drawing Tools Section */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
+                    <SectionHeader label="Draw" isOpen={showDrawingTools} onToggle={() => setShowDrawingTools(!showDrawingTools)} icon={Pen} />
+                    {showDrawingTools && drawingTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                </div>
 
-                        {/* Color Picker */}
-                        <div style={{ display: 'flex', gap: '4px', padding: '0 8px', alignItems: 'center' }}>
+                {/* Shape Tools Section */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
+                    <SectionHeader label="Shapes" isOpen={showShapeTools} onToggle={() => setShowShapeTools(!showShapeTools)} icon={Shapes} />
+                    {showShapeTools && shapeTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                    {showShapeTools && measureTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                </div>
+
+                <Divider />
+
+                {/* Color Panel Section */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
+                    <SectionHeader label="Color" isOpen={showColorPanel} onToggle={() => setShowColorPanel(!showColorPanel)} icon={Palette} />
+                    {showColorPanel && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: 200 }}>
                             {colors.map(color => (
                                 <button
                                     key={color}
                                     onClick={() => updateToolProperty('color', color)}
                                     style={{
-                                        width: '24px',
-                                        height: '24px',
+                                        width: 24 * uiScale,
+                                        height: 24 * uiScale,
                                         borderRadius: '50%',
                                         background: color,
                                         border: toolProperties.color === color
@@ -189,252 +273,106 @@ const Toolbar = () => {
                                     title={color}
                                 />
                             ))}
-                            {/* Custom Color Picker */}
                             <input
                                 type="color"
                                 value={toolProperties.color}
                                 onChange={(e) => updateToolProperty('color', e.target.value)}
                                 style={{
-                                    width: '28px',
-                                    height: '28px',
+                                    width: 24 * uiScale,
+                                    height: 24 * uiScale,
                                     borderRadius: '4px',
                                     border: '2px solid rgba(255, 255, 255, 0.3)',
                                     cursor: 'pointer',
-                                    background: 'transparent',
-                                    padding: '2px'
+                                    background: 'transparent'
                                 }}
                                 title="Custom Color"
                             />
                         </div>
+                    )}
+                </div>
 
-                        {/* Divider */}
-                        <div style={{
-                            width: '1px',
-                            height: '40px',
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            margin: '0 4px'
-                        }} />
-
-                        {/* Fill Color Picker (compact, only for shapes) */}
-                        {['rectangle', 'circle'].includes(activeTool) && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '0 4px', minWidth: '90px' }}>
-                                    <label style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                {/* Settings Section (Size/Opacity) */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
+                    <SectionHeader label="Settings" isOpen={showSettings} onToggle={() => setShowSettings(!showSettings)} icon={Settings2} />
+                    {showSettings && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 8px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <label style={{ fontSize: 10 * uiScale, color: 'rgba(255, 255, 255, 0.7)' }}>
+                                    Size: {toolProperties.thickness}px
+                                </label>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="20"
+                                    value={toolProperties.thickness}
+                                    onChange={(e) => updateToolProperty('thickness', parseInt(e.target.value))}
+                                    style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <label style={{ fontSize: 10 * uiScale, color: 'rgba(255, 255, 255, 0.7)' }}>
+                                    Opacity: {Math.round(toolProperties.opacity * 100)}%
+                                </label>
+                                <input
+                                    type="range"
+                                    min="0.1"
+                                    max="1"
+                                    step="0.1"
+                                    value={toolProperties.opacity}
+                                    onChange={(e) => updateToolProperty('opacity', parseFloat(e.target.value))}
+                                    style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
+                                />
+                            </div>
+                            {['rectangle', 'circle'].includes(activeTool) && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <label style={{ fontSize: 10 * uiScale, color: 'rgba(255, 255, 255, 0.7)' }}>
                                         Fill: {Math.round(toolProperties.fillOpacity * 100)}%
                                     </label>
-                                    <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-                                        {colors.slice(0, 3).map(color => (
-                                            <button
-                                                key={color}
-                                                onClick={() => updateToolProperty('fillColor', color)}
-                                                style={{
-                                                    width: '16px',
-                                                    height: '16px',
-                                                    borderRadius: '50%',
-                                                    background: color,
-                                                    border: toolProperties.fillColor === color
-                                                        ? '2px solid white'
-                                                        : '1px solid rgba(255, 255, 255, 0.3)',
-                                                    cursor: 'pointer',
-                                                    transition: 'all var(--transition-fast)'
-                                                }}
-                                                title={color}
-                                            />
-                                        ))}
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="1"
-                                            step="0.1"
-                                            value={toolProperties.fillOpacity}
-                                            onChange={(e) => updateToolProperty('fillOpacity', parseFloat(e.target.value))}
-                                            style={{
-                                                width: '55px',
-                                                cursor: 'pointer'
-                                            }}
-                                        />
-                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="1"
+                                        step="0.1"
+                                        value={toolProperties.fillOpacity}
+                                        onChange={(e) => updateToolProperty('fillOpacity', parseFloat(e.target.value))}
+                                        style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
+                                    />
                                 </div>
-
-                                {/* Divider */}
-                                <div style={{
-                                    width: '1px',
-                                    height: '40px',
-                                    background: 'rgba(255, 255, 255, 0.2)',
-                                    margin: '0 4px'
-                                }} />
-                            </>
-                        )}
-
-                        {/* Thickness Slider */}
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            padding: '0 8px'
-                        }}>
-                            <label style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                                Size: {toolProperties.thickness}px
-                            </label>
-                            <input
-                                type="range"
-                                min="1"
-                                max="20"
-                                value={toolProperties.thickness}
-                                onChange={(e) => updateToolProperty('thickness', parseInt(e.target.value))}
-                                style={{
-                                    width: '100px',
-                                    accentColor: 'var(--accent-blue)'
-                                }}
-                            />
+                            )}
                         </div>
-
-                        {/* Opacity Slider */}
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            padding: '0 8px'
-                        }}>
-                            <label style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                                Opacity: {Math.round(toolProperties.opacity * 100)}%
-                            </label>
-                            <input
-                                type="range"
-                                min="0.1"
-                                max="1"
-                                step="0.1"
-                                value={toolProperties.opacity}
-                                onChange={(e) => updateToolProperty('opacity', parseFloat(e.target.value))}
-                                style={{
-                                    width: '100px',
-                                    accentColor: 'var(--accent-blue)'
-                                }}
-                            />
-                        </div>
-
-                        {/* Divider */}
-                        <div style={{
-                            width: '1px',
-                            height: '40px',
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            margin: '0 4px'
-                        }} />
-
-                        {/* Action Buttons */}
-                        <button
-                            className="glass-button"
-                            onClick={undo}
-                            title="Undo"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Undo size={20} />
-                        </button>
-                        <button
-                            className="glass-button"
-                            onClick={redo}
-                            title="Redo"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Redo size={20} />
-                        </button>
-                        <button
-                            className="glass-button"
-                            onClick={clearCanvas}
-                            title="Clear All"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Trash2 size={20} />
-                        </button>
-
-                        {/* Divider */}
-                        <div style={{
-                            width: '1px',
-                            height: '40px',
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            margin: '0 4px'
-                        }} />
-
-                        {/* Export/Import Buttons */}
-                        <button
-                            className="glass-button"
-                            onClick={exportCanvasPNG}
-                            title="Export as PNG (Ctrl+E)"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Download size={20} />
-                        </button>
-                        <button
-                            className="glass-button"
-                            onClick={importImage}
-                            title="Import Image (Ctrl+I)"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Upload size={20} />
-                        </button>
-                        <button
-                            className="glass-button"
-                            onClick={() => setShowBackgroundModal(true)}
-                            title="Background & Grid"
-                            style={{
-                                width: '40px',
-                                height: '40px',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Grid size={20} />
-                        </button>
-                    </>
-                )}
-            </div>
-            {isCollapsed && (
-                <div className="glass" style={{
-                    padding: '8px',
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: '12px',
-                    color: 'rgba(255, 255, 255, 0.6)'
-                }}>
-                    Toolbar Collapsed
+                    )}
                 </div>
-            )}
+
+                <Divider />
+
+                {/* Action Buttons - Always Visible */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4 }}>
+                    <button className="glass-button" onClick={undo} title="Undo" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Undo size={iconSize} />
+                    </button>
+                    <button className="glass-button" onClick={redo} title="Redo" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Redo size={iconSize} />
+                    </button>
+                    <button className="glass-button" onClick={clearCanvas} title="Clear All" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Trash2 size={iconSize} />
+                    </button>
+                </div>
+
+                <Divider />
+
+                {/* Export/Import/Grid - Always Visible */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4 }}>
+                    <button className="glass-button" onClick={exportCanvasPNG} title="Export PNG" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Download size={iconSize} />
+                    </button>
+                    <button className="glass-button" onClick={importImage} title="Import Image" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Upload size={iconSize} />
+                    </button>
+                    <button className="glass-button" onClick={() => setShowBackgroundModal(true)} title="Background" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
+                        <Grid size={iconSize} />
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

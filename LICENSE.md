@@ -2,7 +2,7 @@
 
 *Restricted to Personal Use Only (RPUO) License*
 
-**Copyright (c) 2025-2026; The Lab Tutoring, The Lab Technologies, Cassini**
+**Copyright (c) 2025-2026; Orama, Cassini**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to use
@@ -25,7 +25,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Any questions OR inquires must be sent to the contact information:
+Any questions OR inquires must be sent to:
 
-The Lab Tutoring & Technologies //
-Website: bhsthelab.wixsite.com/ontheweb
+Orama // Contact via GitHub repository
