@@ -100,7 +100,14 @@ Apple "Liquid Glass" aesthetic with glassmorphism effects, smooth animations, an
 - Lucide React Icons
 - Google Gemini API
 
-## 📝 What's New in v1.4.7.1
+## 📝 What's New in v1.4.8 - Welcome & Save
+
+- **Welcome Screen** - New landing page with "Cassini by Orama" branding
+- **Manual Save/Load** - Save your work to local JSON files (`Ctrl+S`, `Ctrl+O`)
+- **Recent Files** - Quick access to recently opened canvases
+- **New File Toolbar** - Dedicated file section in toolbar for common actions
+
+### v1.4.7.1
 
 - **Larger Layers Button** - Increased size of layer panel toggle for better accessibility
 

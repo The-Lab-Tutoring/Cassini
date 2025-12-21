@@ -1,5 +1,23 @@
 # Cassini - Release Notes
 
+## Version 1.4.8 - Welcome Screen & Manual Save
+
+**Release Date:** December 21, 2024
+
+### 🚀 New Features
+
+- **Welcome Screen** - Beautiful glassmorphism landing page with Orama branding
+- **Local File System** - Save/Load whiteboards as JSON files
+- **Recent Files** - Track your recent work history
+- **Keyboard Shortcuts** - `Ctrl+S` to Save, `Ctrl+O` to Open
+
+### 📦 Files Created
+
+- **[NEW]** `src/components/WelcomeScreen.jsx` - Main landing page component
+- **[NEW]** `src/utils/fileUtils.js` - Helpers for file I/O
+
+---
+
 ## Version 1.4.7.1 - UI Improvements
 
 **Release Date:** December 16, 2024

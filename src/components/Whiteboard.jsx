@@ -4,6 +4,7 @@ import { snapToRulerEdge, pointInRect } from '../utils/geometry';
 import SelectionToolbar from './SelectionToolbar';
 import SelectionIndicator from './SelectionIndicator';
 import LayersPanel from './LayersPanel';
+import { saveWhiteboard } from '../utils/fileUtils';
 
 const Whiteboard = () => {
     const canvasRef = useRef(null);
@@ -136,6 +137,19 @@ const Whiteboard = () => {
                 } else if (e.key === 'a') {
                     e.preventDefault();
                     setSelectedElements(selectAll());
+                } else if (e.key === 's') { // Ctrl+S to Save
+                    e.preventDefault();
+                    const data = {
+                        version: '1.4.8',
+                        name: 'My Whiteboard',
+                        elements,
+                        background,
+                        viewport
+                    };
+                    saveWhiteboard(data);
+                } else if (e.key === 'o') { // Ctrl+O to Open
+                    e.preventDefault();
+                    document.getElementById('toolbar-file-input')?.click();
                 }
             }
 

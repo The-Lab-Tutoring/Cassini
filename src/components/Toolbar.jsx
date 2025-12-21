@@ -23,8 +23,13 @@ import {
     Grid,
     Palette,
     Settings2,
-    Shapes
+    Shapes,
+    FileText,
+    Save,
+    FolderOpen,
+    FilePlus
 } from 'lucide-react';
+import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
 const Toolbar = () => {
     const {
@@ -38,7 +43,13 @@ const Toolbar = () => {
         setShowTextModal,
         exportCanvasPNG,
         importImage,
-        setShowBackgroundModal
+        setShowBackgroundModal,
+        elements,
+        background,
+        viewport,
+        setElements,
+        updateBackground,
+        setViewport
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -49,6 +60,7 @@ const Toolbar = () => {
     const [showShapeTools, setShowShapeTools] = useState(false);
     const [showColorPanel, setShowColorPanel] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [showFileTools, setShowFileTools] = useState(false);
 
     // Responsive sizing
     const [uiScale, setUiScale] = useState(1);
@@ -231,6 +243,84 @@ const Toolbar = () => {
                 </div>
 
                 <Divider />
+
+                <Divider />
+
+                {/* File Tools Section */}
+                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
+                    <SectionHeader label="File" isOpen={showFileTools} onToggle={() => setShowFileTools(!showFileTools)} icon={FileText} />
+                    {showFileTools && (
+                        <>
+                            <ToolButton
+                                tool={{
+                                    id: 'new',
+                                    icon: FilePlus,
+                                    label: 'New Canvas',
+                                    action: () => {
+                                        if (window.confirm('Are you sure you want to create a new canvas? Unsaved changes will be lost.')) {
+                                            clearCanvas();
+                                        }
+                                    }
+                                }}
+                            />
+                            <ToolButton
+                                tool={{
+                                    id: 'save',
+                                    icon: Save,
+                                    label: 'Save (Ctrl+S)',
+                                    action: () => {
+                                        const data = {
+                                            version: '1.4.8',
+                                            name: 'My Whiteboard',
+                                            elements,
+                                            background,
+                                            viewport
+                                        };
+                                        saveWhiteboard(data);
+                                    }
+                                }}
+                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    id="toolbar-file-input"
+                                    type="file"
+                                    accept=".json"
+                                    onChange={async (e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            try {
+                                                const data = await loadWhiteboard(file);
+                                                if (data.elements) setElements(data.elements);
+                                                if (data.background) updateBackground(data.background);
+                                                if (data.viewport) setViewport(data.viewport);
+                                            } catch (error) {
+                                                alert(error.message);
+                                            }
+                                        }
+                                        e.target.value = null; // Reset input
+                                    }}
+                                    style={{ display: 'none' }}
+                                />
+                                <ToolButton
+                                    tool={{
+                                        id: 'open',
+                                        icon: FolderOpen,
+                                        label: 'Open (Ctrl+O)',
+                                        action: () => document.getElementById('toolbar-file-input').click()
+                                    }}
+                                />
+                            </div>
+                            <ToolButton
+                                tool={{
+                                    id: 'export',
+                                    icon: Download,
+                                    label: 'Export PNG',
+                                    action: exportCanvasPNG
+                                }}
+                            />
+                        </>
+                    )}
+                </div>
 
                 {/* Drawing Tools Section */}
                 <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
