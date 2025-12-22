@@ -1,5 +1,17 @@
 # Cassini - Release Notes
 
+## Version 1.5.0 - Documentation Refactoring
+
+**Release Date:** December 21, 2024
+
+### 🚀 Improvements
+
+- **README Refactor** - Transformed `README.md` into a professional introductory landing page.
+- **Workflow Optimization** - Removed version history from README to consolidate it in `RELEASE_NOTES.md`, streamlining future updates.
+- **Version Bump** - Official transition to v1.5.x series.
+
+---
+
 ## Version 1.4.8 - Welcome Screen & Manual Save
 
 **Release Date:** December 21, 2024

@@ -1,173 +1,80 @@
-# Cassini
+# Cassini by Orama
 
-**Version 1.4.5** - Premium infinite whiteboard with AI chat, selection tools, and flexible layouts
+**Orama Cassini** is a premium, high-performance infinite whiteboard designed for thinkers, designers, and collaborators. Featuring a sleek Apple "Liquid Glass" aesthetic, it combines powerful drawing tools with a built-in AI assistant to create a seamless creative workspace.
 
-## ✨ Features
+---
 
-### Drawing & Creation
+## ✨ Core Features
 
-- **Pen Tool** - Pressure-sensitive drawing with customizable color, thickness, and opacity
-- **Shape Tools** - Rectangle, Circle, Line, and Arrow with fill colors and real-time preview
-- **Text Tool** - Insert formatted text with custom fonts and sizes
-- **Eraser** - Drag to erase with precision
-- **Fill Colors** - Customizable fill color and opacity for shapes (v1.4.1)
+### 🎨 Creative Workspace
 
-### Background & Grid (NEW in v1.4.2)
+- **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
+- **Precision Drawing** - Pressure-sensitive pen tool, shape primitives (Rectangles, Circles, Arrows), and formatted text.
+- **Layers System** - Professional-grade layer management with visibility, reordering, and opacity controls.
+- **Glassmorphism UI** - Modern, responsive interface that adapts to your workflow.
 
-- **Grid Patterns** - Dots, Lines, or Squares background patterns
-- **Custom Grid Size** - Adjustable spacing from 10px to 100px
-- **Canvas Background** - 5 preset colors + custom color picker
-- **Grid Toggle** - Show/hide grid easily
+### 🧠 Intelligent Assistant
 
-### Export & Import
+- **Gemini AI Integration** - Built-in chat assistant powered by Google Gemini for real-time collaboration and brainstorming.
+- **Markdown Support** - Rich text rendering in chat, including code syntax highlighting.
 
-- **Export Canvas** - Download as PNG with white background (Ctrl+E)
-- **Import Images** - Add images to your whiteboard (Ctrl+I)
+### 🛠️ Productivity & Flow
 
-### Navigation & Workspace
+- **Smart Tools** - Ruler, Protractor, and Selection tools for precise layouts.
+- **Local First** - Manual save/load functionality via JSON files and a recent files dashboard.
+- **Professional Export** - Export your work as high-quality PNGs.
+- **Keyboard Mastery** - Extensive shortcuts for power users (P for Pen, Cmd+K for Palette, etc.).
 
-- **Infinite Canvas** - Unlimited drawing space beyond the viewport
-- **Pan & Zoom** - Navigate with Select tool or Ctrl+Scroll
-- **Stylus-Only Mode** - Touch pans, stylus/mouse draws
-- **Vertical Toolbar** - Toggle horizontal/vertical layout (NEW in v1.4.2)
-
-### Keyboard Shortcuts
-
-- **Tools**: P (Pen), E (Eraser), S/V (Select), R (Rectangle), C (Circle), L (Line), A (Arrow)
-- **Undo/Redo**: Ctrl+Z, Ctrl+Y
-- **Clipboard**: Ctrl+C (Copy), Ctrl+V (Paste), Ctrl+D (Duplicate), Ctrl+A (Select All) (v1.4.1)
-
-### Measurement Tools
-
-- **Ruler** - Measurement marks with pen snapping
-- **Protractor** - Angle measurement from 0° to 180°
-
-### AI Assistant
-
-- **Gemini Chat** - Built-in AI powered by Google Gemini (key required)
-- **Markdown Formatting** - Responses with code highlighting (NEW v1.4.3)
-- **Custom Instructions** - Configurable AI behavior (NEW v1.4.3)
-- **Collapsible Sidebar** - Minimize for maximum drawing space
-
-### Selection & Editing
-
-- **Select Tool** - Click or drag-box selection
-- **Multi-Select** - Shift+click for multiple elements
-- **Drag to Move** - Immediate element repositioning
-- **Selection Indicator** - Shows "{count} selected" (NEW in v1.4.2)
-- **Undo/Redo** - Full history support, **except when clearing the whole whiteboard**
+---
 
 ## 🚀 Quick Start
 
+### 1. Prerequisites
+
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [NPM](https://www.npmjs.com/)
+
+### 2. Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/the-lab-tutoring/prime-cassini.git
+cd prime-cassini
+
 # Install dependencies
 npm install
-
-# Set up API key
-# 1. Copy .env.example to .env
-cp .env.example .env
-
-# 2. Edit .env and add your Gemini API key
-# VITE_GEMINI_API_KEY=your_actual_api_key_here
-
-# 3. (OPTIONAL) Change Gemini Model in /src/services/geminiService.js
-# Change in line 5 of geminiService.js
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
 ```
 
-**Getting a Gemini API Key:**
+### 3. Configure AI (Optional)
 
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create a new API key
-3. Add it to your `.env` file
+To use the Gemini AI features, you'll need an API key.
 
-**Note:** Never commit your `.env` file to git. It's already in `.gitignore`.
+1. Get a key at [Google AI Studio](https://aistudio.google.com/).
+2. Create a `.env` file in the root directory.
+3. Add your key: `VITE_GEMINI_API_KEY=your_key_here`.
 
-## 🎨 Design
+### 4. Run Development Server
 
-Apple "Liquid Glass" aesthetic with glassmorphism effects, smooth animations, and premium micro-interactions.
+```bash
+npm run dev
+```
+
+---
 
 ## 🛠️ Tech Stack
 
-- React 18.2.0
-- Vite 4.4.5
-- HTML5 Canvas
-- Lucide React Icons
-- Google Gemini API
+- **React 18** - Component-based UI architecture.
+- **Vite** - Lightning-fast build tool and dev server.
+- **HTML5 Canvas** - High-performance drawing engine.
+- **Lucide React** - Beautiful, consistent iconography.
+- **Google Gemini API** - Advanced AI capabilities.
 
-## 📝 What's New in v1.4.8 - Welcome & Save
+---
 
-- **Welcome Screen** - New landing page with "Cassini by Orama" branding
-- **Manual Save/Load** - Save your work to local JSON files (`Ctrl+S`, `Ctrl+O`)
-- **Recent Files** - Quick access to recently opened canvases
-- **New File Toolbar** - Dedicated file section in toolbar for common actions
+## 📝 Release History
 
-### v1.4.7.1
-
-- **Larger Layers Button** - Increased size of layer panel toggle for better accessibility
-
-### v1.4.7 - Layers System
-
-- **Layers Panel** - Click the layers icon (right side) to manage all elements
-- **Show/Hide Layers** - Eye icon toggles visibility
-- **Reorder Layers** - Drag and drop to change z-order
-- **Layer Opacity** - Slider per layer for transparency control
-- **Layer Naming** - Double-click to rename any layer
-- **Quick Delete** - Delete layers directly from the panel
-
-### v1.4.6 - UI Revamp
-
-- Collapsible Toolbar Sections (Draw, Shapes, Color, Settings)
-- Responsive UI Scaling based on window size
-- Orama Branding
-
-### v1.4.5 - Selection & Alignment Tools
-
-- Selection Toolbar at fixed bottom-right position
-- Alignment Tools: Left/Center/Right, Top/Middle/Bottom
-- Distribute Evenly for 3+ elements
-- Z-Order: Bring to Front / Send to Back
-
-### v1.4.4 - Text Formatting
-
-- Bold/Italic/Underline text styles
-- Text Alignment (Left, Center, Right)
-- Multi-line Text support
-- Text Background colors
-
-### v1.4.3b - Image Manipulation
-
-- 8-point resize handles on images/shapes
-- Rotation handle for free rotation
-- Aspect ratio lock during resize
-
-### v1.4.3a - AI Chat Enhancements
-
-- Markdown chat formatting with syntax highlighting
-- Custom AI instructions via system prompt
-
-### Recent Updates
-
-**v1.4.2 - Background & Grid:**
-
-- Grid patterns (dots, lines, squares) with adjustable size
-- Canvas background colors with color picker
-- Selection count indicator  
-- Vertical toolbar option
-- Logo branding
-
-**v1.4.0 - v1.4.1:**
-
-- Fill colors for shapes (v1.4.1)
-- Clipboard operations (v1.4.1)
-- Performance improvements (v1.4.0)
-
-[View Full Release Notes →](./RELEASE_NOTES.md)
+For a detailed list of changes and version history, please see:
+👉 **[RELEASE_NOTES.md](./RELEASE_NOTES.md)**
 
 ---
 
