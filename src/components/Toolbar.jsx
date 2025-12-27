@@ -27,7 +27,8 @@ import {
     FileText,
     Save,
     FolderOpen,
-    FilePlus
+    FilePlus,
+    Eye
 } from 'lucide-react';
 import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
@@ -50,7 +51,8 @@ const Toolbar = () => {
         setElements,
         updateBackground,
         setViewport,
-        settings
+        settings,
+        updateSettings
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -469,6 +471,14 @@ const Toolbar = () => {
                     </button>
                     <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={() => setShowBackgroundModal(true)} title="Background" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
                         <Grid size={iconSize} />
+                    </button>
+                    <button
+                        className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''} ${settings?.focusMode ? 'active' : ''}`}
+                        onClick={() => updateSettings({ focusMode: !settings?.focusMode })}
+                        title="Focus Mode (F)"
+                        style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}
+                    >
+                        <Eye size={iconSize} />
                     </button>
                 </div>
             </div>

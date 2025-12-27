@@ -10,7 +10,7 @@
 
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
 - **Precision Drawing** - Pressure-sensitive pen tool, shape primitives (Rectangles, Circles, Arrows), and formatted text.
-- **Layers System** - Professional-grade layer management with visibility, reordering, and opacity controls.
+- **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
 - **Glassmorphism UI** - Modern, responsive interface that adapts to your workflow.
 
 ### 🛠️ Productivity & Flow

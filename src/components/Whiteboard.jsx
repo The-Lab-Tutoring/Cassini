@@ -3,7 +3,7 @@ import { useWhiteboard } from '../context/WhiteboardContext';
 import { snapToRulerEdge, pointInRect } from '../utils/geometry';
 import SelectionToolbar from './SelectionToolbar';
 import SelectionIndicator from './SelectionIndicator';
-import LayersPanel from './LayersPanel';
+
 import { saveWhiteboard } from '../utils/fileUtils';
 
 // Helper to get anchor points for a shape
@@ -63,7 +63,9 @@ const Whiteboard = () => {
         duplicateElements,
         selectAll,
         deselectAll,
-        background
+        background,
+        settings,
+        updateSettings
     } = useWhiteboard();
 
     // Initialize canvas
@@ -121,6 +123,10 @@ const Whiteboard = () => {
                         break;
                     case 'a':
                         setActiveTool('arrow');
+                        break;
+                    case 'f':
+                        // Toggle Focus Mode
+                        updateSettings({ focusMode: !settings?.focusMode });
                         break;
                     default:
                         break;
@@ -1422,11 +1428,7 @@ const Whiteboard = () => {
                 />
             )}
             <SelectionIndicator count={selectedElements.length} />
-            <LayersPanel
-                selectedElements={selectedElements}
-                setSelectedElements={setSelectedElements}
-                onDeleteElement={deleteElement}
-            />
+
         </>
     );
 };

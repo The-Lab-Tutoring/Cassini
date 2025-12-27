@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { FilePlus, FolderOpen, Clock, ChevronRight, User } from 'lucide-react';
+import { FilePlus, FolderOpen, Clock, ChevronRight, User, Layout, Grid, AlignJustify, GitBranch, Lightbulb, RotateCcw } from 'lucide-react';
 import { loadWhiteboard, getRecentFiles } from '../utils/fileUtils';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
+// Template definitions
+const TEMPLATES = [
+    { id: 'blank', name: 'Blank Canvas', icon: FilePlus, background: { gridType: 'none', gridSize: 40, gridColor: 'rgba(200, 200, 200, 0.3)', backgroundColor: '#1a1a1a' } },
+    { id: 'lined', name: 'Lined Paper', icon: AlignJustify, background: { gridType: 'lines', gridSize: 30, gridColor: 'rgba(100, 149, 237, 0.3)', backgroundColor: '#f5f5dc' } },
+    { id: 'graph', name: 'Graph Paper', icon: Grid, background: { gridType: 'squares', gridSize: 25, gridColor: 'rgba(0, 122, 255, 0.2)', backgroundColor: '#ffffff' } },
+    { id: 'dots', name: 'Dot Grid', icon: Layout, background: { gridType: 'dots', gridSize: 30, gridColor: 'rgba(150, 150, 150, 0.5)', backgroundColor: '#fafafa' } },
+    { id: 'dark', name: 'Dark Mode', icon: Lightbulb, background: { gridType: 'dots', gridSize: 40, gridColor: 'rgba(255, 255, 255, 0.1)', backgroundColor: '#0a0a0a' } },
+];
+
 const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
-    const { settings, updateSettings } = useWhiteboard();
+    const { settings, updateSettings, updateBackground, hasAutoSave, loadAutoSave, clearAutoSave } = useWhiteboard();
     const [recentFiles, setRecentFiles] = useState([]);
     const [isExiting, setIsExiting] = useState(false);
     const [tempName, setTempName] = useState(settings.userName || '');
     const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState('new');
+    const [hasRecovery, setHasRecovery] = useState(false);
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
-    }, []);
+        setHasRecovery(hasAutoSave());
+    }, [hasAutoSave]);
 
     const handleNewCanvas = () => {
         if (!tempName.trim()) {
@@ -20,8 +32,31 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
             return;
         }
         updateSettings({ userName: tempName.trim() });
+        clearAutoSave(); // Clear auto-save when starting fresh
         setIsExiting(true);
-        setTimeout(onNewCanvas, 300); // Wait for exit animation
+        setTimeout(onNewCanvas, 300);
+    };
+
+    const handleRecoverSession = () => {
+        if (!tempName.trim()) {
+            setError('Please enter your name to continue');
+            return;
+        }
+        updateSettings({ userName: tempName.trim() });
+        loadAutoSave();
+        setIsExiting(true);
+        setTimeout(onNewCanvas, 300);
+    };
+
+    const handleTemplateSelect = (template) => {
+        if (!tempName.trim()) {
+            setError('Please enter your name to continue');
+            return;
+        }
+        updateSettings({ userName: tempName.trim() });
+        updateBackground(template.background);
+        setIsExiting(true);
+        setTimeout(onNewCanvas, 300);
     };
 
     const handleOpenFile = async (e) => {
@@ -190,6 +225,22 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
                             <span>New Canvas</span>
                             <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                         </button>
+
+                        {hasRecovery && (
+                            <button
+                                className="welcome-btn"
+                                onClick={handleRecoverSession}
+                                style={{
+                                    ...buttonStyle,
+                                    background: 'rgba(255, 149, 0, 0.1)',
+                                    border: '1px solid rgba(255, 149, 0, 0.3)'
+                                }}
+                            >
+                                <RotateCcw size={20} style={{ color: '#FF9500' }} />
+                                <span style={{ color: '#FF9500' }}>Recover Last Session</span>
+                                <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5, color: '#FF9500' }} />
+                            </button>
+                        )}
 
                         <div style={{ position: 'relative' }}>
                             <input

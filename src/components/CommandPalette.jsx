@@ -10,7 +10,9 @@ const CommandPalette = () => {
         setShowWelcome,
         clearCanvas,
         exportCanvasPNG,
-        updateBackground
+        updateBackground,
+        settings,
+        updateSettings
     } = useWhiteboard();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +38,9 @@ const CommandPalette = () => {
         { id: 'tool_line', label: 'Draw Line', icon: <Minus size={18} />, category: 'Tools', perform: () => setActiveTool('line') },
         { id: 'tool_arrow', label: 'Draw Arrow', icon: <ArrowRight size={18} />, category: 'Tools', perform: () => setActiveTool('arrow') },
         { id: 'tool_text', label: 'Add Text', icon: <Type size={18} />, category: 'Tools', perform: () => setShowTextModal(true) },
+
+        // Focus Mode
+        { id: 'focus_mode', label: 'Toggle Focus Mode', icon: <Grid size={18} />, category: 'View', perform: () => updateSettings({ focusMode: !settings?.focusMode }) },
     ];
 
     const filteredActions = actions.filter(action =>

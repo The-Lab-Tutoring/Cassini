@@ -125,6 +125,28 @@ const SettingsSidebar = () => {
                         </div>
                     </div>
 
+                    {/* Stroke Smoothing */}
+                    <div style={{ marginBottom: '32px' }}>
+                        <h3 style={sectionTitleStyle}>Stroke Smoothing</h3>
+                        <div style={{ display: 'flex', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                            <button
+                                onClick={() => updateSettings({ strokeSmoothing: true })}
+                                style={{ ...toggleButtonStyle, background: settings.strokeSmoothing ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                            >
+                                <span>On</span>
+                            </button>
+                            <button
+                                onClick={() => updateSettings({ strokeSmoothing: false })}
+                                style={{ ...toggleButtonStyle, background: !settings.strokeSmoothing ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                            >
+                                <span>Off</span>
+                            </button>
+                        </div>
+                        <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '8px' }}>
+                            Smoother lines using Bezier curve interpolation
+                        </p>
+                    </div>
+
                     {/* Grid Type */}
                     <div style={{ marginBottom: '32px' }}>
                         <h3 style={sectionTitleStyle}>Grid Type</h3>
@@ -197,8 +219,18 @@ const SettingsSidebar = () => {
 
                 {/* Footer */}
                 <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.3)', textAlign: 'center' }}>
-                        Cassini v1.5.3
+                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.3)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <img
+                            src="/logo.png"
+                            alt="Cassini"
+                            style={{
+                                height: '14px',
+                                width: 'auto',
+                                opacity: 0.5,
+                                filter: settings.iconTheme === 'light' ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
+                            }}
+                        />
+                        <span>Cassini v1.6.0</span>
                     </div>
                 </div>
 

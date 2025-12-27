@@ -1,5 +1,25 @@
 # Cassini - Release Notes
 
+## [1.6.0] - 2025-12-26
+
+### The Solo Experience Update
+
+This major update focuses on refining the individual creative workflow, removing distractions, and ensuring your work is always safe.
+
+### Added
+
+- **Auto-Save**: Your work is automatically saved to local storage every 60 seconds. A "Recover Last Session" option appears on the Welcome Screen if a session was closed unexpectedly.
+- **Focus Mode**: Press `F` or click the Eye icon in the toolbar to hide all UI elements for a pure drawing experience. Floating button allows easy exit.
+- **Stroke Smoothing**: New setting in the sidebar to toggle Bezier curve smoothing for cleaner, more natural freehand lines.
+- **Logo in Settings**: Added branding to the settings footer.
+
+### Removed
+
+- **Layers System**: Removed the layers panel to simplify the interface and focus on speed and direct manipulation.
+- **Templates**: Removed template presets to streamline the "New Canvas" flow.
+
+---
+
 ## [1.5.3] - 2025-12-22
 
 ### Added

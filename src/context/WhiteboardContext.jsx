@@ -1,4 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+
+// Auto-save constants
+const AUTO_SAVE_KEY = 'cassini_autosave';
+const AUTO_SAVE_INTERVAL = 60000; // 60 seconds
 
 const WhiteboardContext = createContext();
 
@@ -45,7 +49,9 @@ export const WhiteboardProvider = ({ children }) => {
     // Settings
     const [settings, setSettings] = useState({
         userName: 'User',
-        iconTheme: 'liquid' // 'liquid' | 'light'
+        iconTheme: 'liquid', // 'liquid' | 'light'
+        strokeSmoothing: true,
+        focusMode: false
     });
 
     // Viewport state for Infinite Canvas
@@ -244,6 +250,60 @@ export const WhiteboardProvider = ({ children }) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
     }, []);
 
+    // Auto-save logic
+    const autoSaveRef = useRef(null);
+
+    useEffect(() => {
+        // Don't auto-save if on welcome screen or no elements
+        if (showWelcome) return;
+
+        autoSaveRef.current = setInterval(() => {
+            if (elements.length > 0) {
+                const saveData = {
+                    elements,
+                    background,
+                    viewport,
+                    timestamp: Date.now(),
+                    userName: settings.userName
+                };
+                localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(saveData));
+                console.log('Auto-saved at', new Date().toLocaleTimeString());
+            }
+        }, AUTO_SAVE_INTERVAL);
+
+        return () => {
+            if (autoSaveRef.current) {
+                clearInterval(autoSaveRef.current);
+            }
+        };
+    }, [showWelcome, elements, background, viewport, settings.userName]);
+
+    const hasAutoSave = useCallback(() => {
+        return localStorage.getItem(AUTO_SAVE_KEY) !== null;
+    }, []);
+
+    const loadAutoSave = useCallback(() => {
+        const savedData = localStorage.getItem(AUTO_SAVE_KEY);
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                if (data.elements) setElements(data.elements);
+                if (data.background) setBackground(prev => ({ ...prev, ...data.background }));
+                if (data.viewport) setViewport(data.viewport);
+                if (data.userName) setSettings(prev => ({ ...prev, userName: data.userName }));
+                return data;
+            } catch (e) {
+                console.error('Failed to load auto-save:', e);
+                return null;
+            }
+        }
+        return null;
+    }, []);
+
+    const clearAutoSave = useCallback(() => {
+        localStorage.removeItem(AUTO_SAVE_KEY);
+    }, []);
+
     const value = {
         activeTool,
         setActiveTool,
@@ -293,7 +353,10 @@ export const WhiteboardProvider = ({ children }) => {
         showSettingsSidebar,
         setShowSettingsSidebar,
         showWelcome,
-        setShowWelcome
+        setShowWelcome,
+        hasAutoSave,
+        loadAutoSave,
+        clearAutoSave
     };
 
     return (
