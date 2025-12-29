@@ -1,6 +1,6 @@
 # Cassini by Orama
 
-**Orama Cassini** is a premium, high-performance infinite whiteboard designed for thinkers, designers, and collaborators. Featuring a sleek Apple "Liquid Glass" aesthetic, it provides a powerful, distraction-free environment for brainstorming and creative work.
+**Cassini** is a premium, high-performance infinite whiteboard designed for thinkers, designers, and collaborators. Featuring a sleek Apple "Liquid Glass" aesthetic, it provides a powerful, distraction-free environment for brainstorming and creative work.
 
 ---
 
