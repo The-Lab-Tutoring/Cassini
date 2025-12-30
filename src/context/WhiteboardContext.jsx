@@ -60,7 +60,8 @@ export const WhiteboardProvider = ({ children }) => {
         strokeSmoothing: true,
         focusMode: false,
         gridSnapping: false,
-        showClock: true
+        showClock: true,
+        isMultiSelectMode: false // Tablet mode
     });
 
     // Creative Intelligence Settings

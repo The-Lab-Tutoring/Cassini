@@ -1181,7 +1181,7 @@ const Whiteboard = () => {
             const clickedElement = elements.find(el => isPointNearElement(pos, el));
 
             if (clickedElement) {
-                if (e.shiftKey) {
+                if (e.shiftKey || settings.isMultiSelectMode) {
                     setSelectedElements(prev =>
                         prev.includes(clickedElement)
                             ? prev.filter(el => el.id !== clickedElement.id)
@@ -1205,8 +1205,10 @@ const Whiteboard = () => {
             } else {
                 // Start selection box
                 setSelectionBox({ x: pos.x, y: pos.y, width: 0, height: 0, startX: pos.x, startY: pos.y });
-                setSelectedElement(null);
-                setSelectedElements([]);
+                if (!e.shiftKey && !settings.isMultiSelectMode) {
+                    setSelectedElement(null);
+                    setSelectedElements([]);
+                }
             }
         } else if (activeTool === 'ruler') {
             setRuler({

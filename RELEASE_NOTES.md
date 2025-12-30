@@ -6,6 +6,7 @@
 
 - **Laser Pointer Tool**: Ephemeral strokes with a 2-second glow effect, perfect for presentations.
 - **Handwriting OCR (v1)**: Integrated **Tesseract.js** engine to convert handwritten strokes into editable text elements (English).
+- **Tablet Multi-Select**: New toggleable mode in the toolbar to simulate "Shift+Click" behavior for touch users, allowing easy selection of multiple elements.
 - **Creative Intelligence Panel**: New toggleable settings section to control all CI features independently.
 - **Branded CI Experience**: Integrated "Creative Intelligence v1" branding across the settings and command palette.
 

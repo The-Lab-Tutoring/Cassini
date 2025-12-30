@@ -266,6 +266,26 @@ const Toolbar = () => {
                     {activeCategory === 'draw' && (
                         <>
                             {drawingTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+
+                            {activeTool === 'select' && (
+                                <button
+                                    className={`glass-button ${settings.isMultiSelectMode ? 'active' : ''} ${isLight ? 'light-icons' : ''}`}
+                                    onClick={() => updateSettings({ isMultiSelectMode: !settings.isMultiSelectMode })}
+                                    title="Multi-Select Mode (Tablets)"
+                                    style={{
+                                        width: baseSize,
+                                        height: baseSize,
+                                        padding: baseSize * 0.2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: settings.isMultiSelectMode ? 'rgba(0, 122, 255, 0.2)' : 'transparent',
+                                        color: settings.isMultiSelectMode ? '#007AFF' : undefined
+                                    }}
+                                >
+                                    <span style={{ fontWeight: 800, fontSize: 16 }}>+</span>
+                                </button>
+                            )}
                             <Divider />
                             <div style={{ display: 'flex', gap: '8px', padding: '0 8px' }}>
                                 {colors.map(color => (
