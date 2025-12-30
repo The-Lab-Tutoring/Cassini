@@ -56,18 +56,27 @@ const SessionTimer = () => {
                     alignItems: 'center',
                     gap: '6px',
                     padding: '4px 10px',
-                    background: 'rgba(0, 122, 255, 0.15)',
-                    color: '#007AFF',
+                    background: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.4)',
+                    color: isLight ? '#000000' : '#ffffff',
                     borderRadius: '20px',
                     fontSize: '10px',
                     fontWeight: '700',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(0, 122, 255, 0.2)',
-                    animation: 'fadeIn 0.3s ease'
+                    border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(255, 255, 255, 0.08)',
+                    animation: 'fadeIn 0.3s ease',
+                    boxShadow: isLight ? '0 2px 8px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.3)'
                 }}>
-                    <Sparkles size={10} />
+                    <img
+                        src="/ci-logo.png"
+                        alt="CI"
+                        style={{
+                            height: '12px',
+                            width: 'auto',
+                            filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.8)'
+                        }}
+                    />
                     <span>Creative intelligence v1</span>
                 </div>
             )}

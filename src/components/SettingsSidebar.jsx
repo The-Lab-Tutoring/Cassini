@@ -355,10 +355,20 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.7.4</span>
+                        <span>Cassini v1.7.4.1</span>
                     </div>
-                    <div style={{ fontSize: '10px', color: isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        Creative Intelligence v1
+                    <div style={{ fontSize: '10px', color: isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <img
+                            src="/ci-logo.png"
+                            alt="CI"
+                            style={{
+                                height: '12px',
+                                width: 'auto',
+                                opacity: 0.5,
+                                filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
+                            }}
+                        />
+                        <span>Creative Intelligence v1</span>
                     </div>
                 </div>
 

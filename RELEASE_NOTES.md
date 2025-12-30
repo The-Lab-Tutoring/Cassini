@@ -1,6 +1,26 @@
 # Cassini - Release Notes
 
-## [1.7.4] - 2025-12-30
+## v1.7.4.1 (2025-12-30)
+
+### 🔧 Polish & Precision
+
+This update focuses on refining the tablet experience and addressing UI inconsistencies before the major 1.8.x cycle.
+
+#### New Features
+
+- **Tablet Pan Controls**: Added a mini "D-pad" (Left/Right/Up/Down arrows) to the Zoom toolbar for precise viewport panning on touch devices.
+- **Theme-Aware Branding**: The "Creative Intelligence v1" indicator now dynamically adapts to Light Mode (White pill/Black text) and Liquid Glass Mode (Dark pill/White text).
+- **Branded Logo**: Integrated the official CI-v1 logo into the Settings Sidebar and Active Indicator.
+
+#### Bug Fixes
+
+- **Full Screen Toggle**: Fixed the maximize button in the Zoom bar to correctly trigger the browser's native Full Screen mode instead of resetting zoom.
+- **Zoom Visibility**: Fixed an issue where zoom controls were invisible (white-on-white) in Light Mode.
+- **Tool Logic**: Fixed a ReferenceError that caused the app to crash when using the Multi-Select tool on tablets.
+
+---
+
+## v1.7.4 (2025-12-30)
 
 ### Phase 4: Creative Intelligence
 

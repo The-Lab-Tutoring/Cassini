@@ -1,12 +1,24 @@
 import React from 'react';
 import { useWhiteboard } from '../context/WhiteboardContext';
-import { Plus, Minus, Maximize } from 'lucide-react';
+import { Plus, Minus, Maximize, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const ZoomControls = () => {
-    const { viewport, zoomIn, zoomOut, resetZoom, settings } = useWhiteboard();
+    const { viewport, setViewport, zoomIn, zoomOut, resetZoom, settings } = useWhiteboard();
     const isLight = settings.iconTheme === 'light';
 
     const zoomPercentage = Math.round(viewport.scale * 100);
+
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    };
 
     return (
         <div style={{
@@ -28,7 +40,7 @@ const ZoomControls = () => {
         }}>
             <button
                 onClick={zoomOut}
-                className="glass-button"
+                className={`glass-button ${isLight ? 'light-icons' : ''}`}
                 title="Zoom Out"
                 style={{ width: '32px', height: '32px', padding: '6px' }}
             >
@@ -37,7 +49,7 @@ const ZoomControls = () => {
 
             <button
                 onClick={resetZoom}
-                className="glass-button"
+                className={`glass-button ${isLight ? 'light-icons' : ''}`}
                 title="Reset Zoom"
                 style={{
                     padding: '0 8px',
@@ -55,23 +67,62 @@ const ZoomControls = () => {
 
             <button
                 onClick={zoomIn}
-                className="glass-button"
+                className={`glass-button ${isLight ? 'light-icons' : ''}`}
                 title="Zoom In"
                 style={{ width: '32px', height: '32px', padding: '6px' }}
             >
                 <Plus size={18} />
             </button>
 
-            <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
+            <div style={{ width: '1px', height: '20px', background: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
 
             <button
-                onClick={resetZoom}
-                className="glass-button"
-                title="Fit to Screen"
+                onClick={toggleFullscreen}
+                className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                title="Toggle Full Screen"
                 style={{ width: '32px', height: '32px', padding: '6px' }}
             >
                 <Maximize size={18} />
             </button>
+
+            <div style={{ width: '1px', height: '20px', background: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
+
+            <div style={{ display: 'flex', gap: '2px' }}>
+                <button
+                    onClick={() => setViewport(prev => ({ ...prev, x: prev.x + 100 }))}
+                    className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                    title="Pan Left"
+                    style={{ width: '32px', height: '32px', padding: '6px' }}
+                >
+                    <ArrowLeft size={18} />
+                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <button
+                        onClick={() => setViewport(prev => ({ ...prev, y: prev.y + 100 }))}
+                        className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                        title="Pan Up"
+                        style={{ width: '32px', height: '15px', padding: '0 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        <ArrowUp size={12} />
+                    </button>
+                    <button
+                        onClick={() => setViewport(prev => ({ ...prev, y: prev.y - 100 }))}
+                        className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                        title="Pan Down"
+                        style={{ width: '32px', height: '15px', padding: '0 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        <ArrowDown size={12} />
+                    </button>
+                </div>
+                <button
+                    onClick={() => setViewport(prev => ({ ...prev, x: prev.x - 100 }))}
+                    className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                    title="Pan Right"
+                    style={{ width: '32px', height: '32px', padding: '6px' }}
+                >
+                    <ArrowRight size={18} />
+                </button>
+            </div>
         </div>
     );
 };
