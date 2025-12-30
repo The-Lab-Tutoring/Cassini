@@ -328,7 +328,7 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.7.2</span>
+                        <span>Cassini v1.7.3</span>
                     </div>
                 </div>
 
