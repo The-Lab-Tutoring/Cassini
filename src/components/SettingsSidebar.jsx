@@ -185,6 +185,55 @@ const SettingsSidebar = () => {
                         </div>
                     )}
 
+                    {/* Pro Utilities */}
+                    {(isVisible('timer') || isVisible('snapping')) && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Pro Utilities</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {/* Session Timer */}
+                                {isVisible('timer') && (
+                                    <div>
+                                        <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>Session Timer</div>
+                                        <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                                            <button
+                                                onClick={() => updateSettings({ showTimer: true })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: settings.showTimer ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                            >
+                                                <span>On</span>
+                                            </button>
+                                            <button
+                                                onClick={() => updateSettings({ showTimer: false })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: !settings.showTimer ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                            >
+                                                <span>Off</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                {/* Grid Snapping */}
+                                {isVisible('snapping') && (
+                                    <div>
+                                        <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>Grid Snapping</div>
+                                        <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                                            <button
+                                                onClick={() => updateSettings({ gridSnapping: true })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: settings.gridSnapping ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                            >
+                                                <span>On</span>
+                                            </button>
+                                            <button
+                                                onClick={() => updateSettings({ gridSnapping: false })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: !settings.gridSnapping ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                            >
+                                                <span>Off</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Grid Type */}
                     {isVisible('grid') && (
                         <div style={{ marginBottom: '32px' }}>
@@ -279,7 +328,7 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.7.1</span>
+                        <span>Cassini v1.7.2</span>
                     </div>
                 </div>
 

@@ -1,5 +1,16 @@
 # Cassini - Release Notes
 
+## [1.7.2] - 2025-12-29
+
+### Phase 2: The Power Utilities
+
+- **Vector Export (SVG)**: High-fidelity SVG export that preserves path data and shapes, perfect for professional design workflows.
+- **Document Export (PDF)**: integrated `jsPDF` for instant canvas-to-PDF generation, allowing for easy documentation of whiteboard sessions.
+- **Session Timer**: Added dynamic floating timer to track session duration. Toggleable via settings sidebar.
+- **Grid Snapping**: Implemented precision coordinate snapping. Elements now snap to the grid and ruler edges for perfect alignment.
+- **Text-Rich Toolbar**: Refined the file management category to use clear text labels instead of icons, improving usability for export and save actions.
+- **Refined Versioning**: Formally bumped version to v1.7.2.
+
 ## [1.7.1] - 2025-12-29
 
 ### Phase 1: Full UI Revamp

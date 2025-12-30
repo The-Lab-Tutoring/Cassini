@@ -28,7 +28,9 @@ import {
     Save,
     FolderOpen,
     FilePlus,
-    Eye
+    Eye,
+    Image as ImageIcon,
+    Box
 } from 'lucide-react';
 import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
@@ -43,6 +45,8 @@ const Toolbar = () => {
         clearCanvas,
         setShowTextModal,
         exportCanvasPNG,
+        exportCanvasSVG,
+        exportCanvasPDF,
         importImage,
         setShowBackgroundModal,
         elements,
@@ -130,6 +134,32 @@ const Toolbar = () => {
                 }}
             >
                 <Icon size={iconSize} />
+            </button>
+        );
+    };
+
+    const TextToolButton = ({ tool }) => {
+        const isLight = settings.iconTheme === 'light';
+        return (
+            <button
+                className={`glass-button ${isLight ? 'light-icons' : ''}`}
+                onClick={() => handleToolClick(tool)}
+                style={{
+                    padding: '8px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    letterSpacing: '0.3px',
+                    height: baseSize,
+                    minWidth: 'auto',
+                    width: 'auto',
+                    borderRadius: 'var(--radius-md)',
+                    whiteSpace: 'nowrap'
+                }}
+            >
+                {tool.label}
             </button>
         );
     };
@@ -287,15 +317,15 @@ const Toolbar = () => {
                     )}
                     {activeCategory === 'file' && (
                         <>
-                            <ToolButton
+                            <TextToolButton
                                 tool={{
                                     id: 'new',
                                     icon: FilePlus,
-                                    label: 'New Canvas',
+                                    label: 'New',
                                     action: () => window.confirm('New canvas?') && clearCanvas()
                                 }}
                             />
-                            <ToolButton
+                            <TextToolButton
                                 tool={{
                                     id: 'save',
                                     icon: Save,
@@ -325,7 +355,7 @@ const Toolbar = () => {
                                     }}
                                     style={{ display: 'none' }}
                                 />
-                                <ToolButton
+                                <TextToolButton
                                     tool={{
                                         id: 'open',
                                         icon: FolderOpen,
@@ -334,19 +364,35 @@ const Toolbar = () => {
                                     }}
                                 />
                             </div>
-                            <ToolButton
+                            <TextToolButton
                                 tool={{
-                                    id: 'export',
-                                    icon: Download,
+                                    id: 'export-png',
+                                    icon: ImageIcon,
                                     label: 'Export PNG',
                                     action: exportCanvasPNG
                                 }}
                             />
-                            <ToolButton
+                            <TextToolButton
+                                tool={{
+                                    id: 'export-svg',
+                                    icon: Box,
+                                    label: 'Export SVG',
+                                    action: exportCanvasSVG
+                                }}
+                            />
+                            <TextToolButton
+                                tool={{
+                                    id: 'export-pdf',
+                                    icon: FileText,
+                                    label: 'Export PDF',
+                                    action: exportCanvasPDF
+                                }}
+                            />
+                            <TextToolButton
                                 tool={{
                                     id: 'import-img',
                                     icon: Upload,
-                                    label: 'Import Image',
+                                    label: 'Import',
                                     action: importImage
                                 }}
                             />

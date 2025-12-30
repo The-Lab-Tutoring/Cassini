@@ -820,6 +820,26 @@ const Whiteboard = () => {
         };
     };
 
+    const snapPos = (pos) => {
+        let snapped = { ...pos };
+
+        // 1. Grid Snapping
+        if (settings.gridSnapping && background.gridType !== 'none') {
+            const size = background.gridSize;
+            snapped.x = Math.round(snapped.x / size) * size;
+            snapped.y = Math.round(snapped.y / size) * size;
+        }
+
+        // 2. Ruler Snapping (takes precedence)
+        if (ruler) {
+            const rulerSnapped = snapToRulerEdge(snapped.x, snapped.y, ruler);
+            snapped.x = rulerSnapped.x;
+            snapped.y = rulerSnapped.y;
+        }
+
+        return snapped;
+    };
+
     const isPointNearElement = (pos, element) => {
         if (element.type === 'stroke') {
             return element.points.some(p =>
@@ -866,7 +886,8 @@ const Whiteboard = () => {
 
     const handlePointerDown = (e) => {
         e.target.setPointerCapture(e.pointerId);
-        const pos = getPointerPos(e);
+        const rawPos = getPointerPos(e);
+        const pos = snapPos(rawPos);
 
         // TOUCH INPUT: Let touch work like mouse for now (no special pan behavior)
         // Multi-touch gestures can be added in a future update
@@ -1023,7 +1044,8 @@ const Whiteboard = () => {
     };
 
     const handlePointerMove = (e) => {
-        const pos = getPointerPos(e);
+        const rawPos = getPointerPos(e);
+        const pos = snapPos(rawPos);
 
         // TOUCH INPUT: Pan
         if (isPanning && e.pointerType === 'touch') {
@@ -1145,8 +1167,7 @@ const Whiteboard = () => {
         }
 
         if (isDrawing && activeTool === 'pen') {
-            const snappedPos = ruler ? snapToRulerEdge(pos.x, pos.y, ruler) : pos;
-            const newPoint = { ...snappedPos, pressure: e.pressure || 0.5 };
+            const newPoint = { ...pos, pressure: e.pressure || 0.5 };
 
             // Add to ref path
             currentPathRef.current.push(newPoint);

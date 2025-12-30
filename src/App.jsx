@@ -8,6 +8,7 @@ import BackgroundModal from './components/BackgroundModal';
 import Branding from './components/Branding';
 import WelcomeScreen from './components/WelcomeScreen';
 import SettingsSidebar from './components/SettingsSidebar';
+import SessionTimer from './components/SessionTimer';
 import CommandPalette from './components/CommandPalette';
 import './App.css';
 
@@ -33,6 +34,7 @@ const MainLayout = () => {
             )}
             <div style={{ opacity: showWelcome ? 0 : 1, transition: 'opacity 0.5s ease' }}>
                 <Whiteboard />
+                <SessionTimer />
                 {!focusMode && (
                     <>
                         <Toolbar />

@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { exportToSVG, downloadSVG } from '../utils/svgExport';
+import { exportToPDF } from '../utils/pdfExport';
 
 // Auto-save constants
 const AUTO_SAVE_KEY = 'cassini_autosave';
@@ -52,7 +54,9 @@ export const WhiteboardProvider = ({ children }) => {
         userName: 'User',
         iconTheme: 'liquid', // 'liquid' | 'light'
         strokeSmoothing: true,
-        focusMode: false
+        focusMode: false,
+        gridSnapping: false,
+        showTimer: true
     });
 
     // Viewport state for Infinite Canvas
@@ -157,7 +161,21 @@ export const WhiteboardProvider = ({ children }) => {
         link.download = `cassini-${settings.userName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`;
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
-    }, [canvasRef]);
+    }, [canvasRef, settings.userName]);
+
+    const exportCanvasSVG = useCallback(() => {
+        const svgContent = exportToSVG(elements, background);
+        if (svgContent) {
+            const filename = `cassini-${settings.userName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.svg`;
+            downloadSVG(svgContent, filename);
+        }
+    }, [elements, background, settings.userName]);
+
+    const exportCanvasPDF = useCallback(() => {
+        if (!canvasRef) return;
+        const filename = `cassini-${settings.userName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+        exportToPDF(canvasRef, filename);
+    }, [canvasRef, settings.userName]);
 
     const importImage = useCallback(() => {
         const input = document.createElement('input');
@@ -350,6 +368,8 @@ export const WhiteboardProvider = ({ children }) => {
         canvasRef,
         setCanvasRef,
         exportCanvasPNG,
+        exportCanvasSVG,
+        exportCanvasPDF,
         importImage,
         copyElements,
         pasteElements,

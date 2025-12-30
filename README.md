@@ -14,11 +14,10 @@
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
 - **Dynamic Themes** - Apple-inspired "Liquid Glass" and "High-Contrast Light Mode" with automatic canvas background syncing.
 
-### 🛠️ Productivity & Flow
-
-- **Smart Tools** - Ruler, Protractor, and Selection tools for precise layouts.
-- **Local First** - Manual save/load functionality via JSON files and a recent files dashboard.
-- **Professional Export** - Export your work as high-quality PNGs.
+- **Professional Export** - High-quality PNG, SVG (Vector), and PDF export options.
+- **Session Timer** - Floating session duration tracker to monitor development or study time.
+- **Grid Snapping** - Precise element alignment with toggleable grid/ruler snapping.
+- **Text-Rich UI** - Streamlined file management with clear text-based labels in the toolbar.
 - **Keyboard Mastery** - Extensive shortcuts for power users (P for Pen, Cmd+K for Palette, etc.).
 
 ---
