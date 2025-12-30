@@ -305,6 +305,25 @@ const Toolbar = () => {
                                         }}
                                     />
                                 ))}
+                                <div style={{ position: 'relative', width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.3)' }}>
+                                    <input
+                                        type="color"
+                                        value={toolProperties.color}
+                                        onChange={(e) => updateToolProperty('color', e.target.value)}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-50%',
+                                            left: '-50%',
+                                            width: '200%',
+                                            height: '200%',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            margin: 0,
+                                            border: 'none'
+                                        }}
+                                        title="Custom Color"
+                                    />
+                                </div>
                             </div>
                             <Divider />
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px' }}>
@@ -332,7 +351,7 @@ const Toolbar = () => {
                             <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'lines' })} style={{ fontSize: '10px' }}>Lines</button>
                             <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'squares' })} style={{ fontSize: '10px' }}>Grid</button>
                             <Divider />
-                            <div style={{ display: 'flex', gap: '4px' }}>
+                            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                                 {['#1a1a1a', '#ffffff', '#f5f5f7', '#000000'].map(bg => (
                                     <button
                                         key={bg}
@@ -344,6 +363,25 @@ const Toolbar = () => {
                                         }}
                                     />
                                 ))}
+                                <div style={{ position: 'relative', width: 20, height: 20, borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+                                    <input
+                                        type="color"
+                                        value={background.backgroundColor}
+                                        onChange={(e) => updateBackground({ backgroundColor: e.target.value })}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-50%',
+                                            left: '-50%',
+                                            width: '200%',
+                                            height: '200%',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            margin: 0,
+                                            border: 'none'
+                                        }}
+                                        title="Custom Background"
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}

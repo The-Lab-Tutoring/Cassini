@@ -31,8 +31,8 @@ const SessionTimer = () => {
             pointerEvents: 'none'
         }}>
             <div style={{
-                background: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.4)',
-                backdropFilter: 'blur(10px)',
+                background: isLight ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(40px) saturate(180%)',
                 padding: '8px 12px',
                 borderRadius: '12px',
                 display: 'flex',
@@ -56,14 +56,14 @@ const SessionTimer = () => {
                     alignItems: 'center',
                     gap: '6px',
                     padding: '4px 10px',
-                    background: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.4)',
+                    background: isLight ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.05)',
                     color: isLight ? '#000000' : '#ffffff',
                     borderRadius: '20px',
                     fontSize: '10px',
                     fontWeight: '700',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    backdropFilter: 'blur(10px)',
+                    backdropFilter: 'blur(40px) saturate(180%)',
                     border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(255, 255, 255, 0.08)',
                     animation: 'fadeIn 0.3s ease',
                     boxShadow: isLight ? '0 2px 8px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.3)'

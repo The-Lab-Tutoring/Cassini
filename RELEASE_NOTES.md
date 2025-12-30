@@ -1,5 +1,16 @@
 # Cassini - Release Notes
 
+## v1.7.4.2 (2025-12-30)
+
+### Bugfixing Colors & Glassmorphism
+
+- **Fixed**: Resolved an issue where the background color was not updating correctly when switching between Light and Liquid Glass modes.
+- **Fixed**: Resolved an issue where in the new UI from v1.7.1, the custom stroke color button was not shown in the toolbar.
+- **Changed**: Made the Settings Toolbar, Zoom Controls, System Clock, and Creative Intelligence pill have more glassmorphism.
+
+---
+ Cassini - Release Notes
+
 ## v1.7.4.1 (2025-12-30)
 
 ### 🔧 Polish & Precision

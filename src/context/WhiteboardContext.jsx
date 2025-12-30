@@ -311,13 +311,19 @@ export const WhiteboardProvider = ({ children }) => {
     }, []);
 
     // Sync background color with icon theme
+    // Sync background color with icon theme ONLY when theme changes
+    const prevThemeRef = useRef(settings.iconTheme);
+
     useEffect(() => {
-        if (settings.iconTheme === 'light' && background.backgroundColor !== '#ffffff') {
-            updateBackground({ backgroundColor: '#ffffff', gridColor: 'rgba(0, 0, 0, 0.1)' });
-        } else if (settings.iconTheme === 'liquid' && background.backgroundColor !== '#1a1a1a') {
-            updateBackground({ backgroundColor: '#1a1a1a', gridColor: 'rgba(200, 200, 200, 0.3)' });
+        if (prevThemeRef.current !== settings.iconTheme) {
+            if (settings.iconTheme === 'light') {
+                updateBackground({ backgroundColor: '#ffffff', gridColor: 'rgba(0, 0, 0, 0.1)' });
+            } else {
+                updateBackground({ backgroundColor: '#1a1a1a', gridColor: 'rgba(200, 200, 200, 0.3)' });
+            }
+            prevThemeRef.current = settings.iconTheme;
         }
-    }, [settings.iconTheme, updateBackground, background.backgroundColor]);
+    }, [settings.iconTheme, updateBackground]);
 
     // Auto-save logic
     const autoSaveRef = useRef(null);
