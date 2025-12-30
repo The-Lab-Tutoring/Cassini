@@ -9,7 +9,8 @@
 ### 🎨 Creative Workspace
 
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
-- **Precision Drawing** - Pressure-sensitive pen tool, shape primitives (Rectangles, Circles, Arrows), and formatted text.
+- **Stacked Navigation** - New bottom-anchored toolbar with contextual secondary bars for a cleaner, modern workflow.
+- **Searchable Sidebar** - Enhanced settings experience with real-time filtering and category tagging.
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
 - **Dynamic Themes** - Apple-inspired "Liquid Glass" and "High-Contrast Light Mode" with automatic canvas background syncing.
 

@@ -17,6 +17,7 @@ export const useWhiteboard = () => {
 export const WhiteboardProvider = ({ children }) => {
     // Tool state
     const [activeTool, setActiveTool] = useState('pen');
+    const [activeCategory, setActiveCategory] = useState('draw'); // 'draw' | 'shapes' | 'file' | 'background' | 'settings'
     const [toolProperties, setToolProperties] = useState({
         color: '#007AFF',
         fillColor: '#007AFF',
@@ -316,6 +317,8 @@ export const WhiteboardProvider = ({ children }) => {
     const value = {
         activeTool,
         setActiveTool,
+        activeCategory,
+        setActiveCategory,
         toolProperties,
         updateToolProperty,
         elements,

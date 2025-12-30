@@ -5,6 +5,7 @@ import { useWhiteboard } from '../context/WhiteboardContext';
 const CommandPalette = () => {
     const {
         setActiveTool,
+        setActiveCategory,
         setShowTextModal,
         setShowSettingsSidebar,
         setShowWelcome,
@@ -21,23 +22,23 @@ const CommandPalette = () => {
     const inputRef = useRef(null);
 
     const actions = [
-        { id: 'grid_dots', label: 'Set Grid to Dots', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateBackground({ gridType: 'dots' }) },
-        { id: 'grid_lines', label: 'Set Grid to Lines', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateBackground({ gridType: 'lines' }) },
-        { id: 'grid_squares', label: 'Set Grid to Squares', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateBackground({ gridType: 'squares' }) },
-        { id: 'grid_none', label: 'Remove Grid', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateBackground({ gridType: 'none' }) },
+        { id: 'grid_dots', label: 'Set Grid to Dots', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'dots' }); setActiveCategory('background'); } },
+        { id: 'grid_lines', label: 'Set Grid to Lines', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'lines' }); setActiveCategory('background'); } },
+        { id: 'grid_squares', label: 'Set Grid to Squares', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'squares' }); setActiveCategory('background'); } },
+        { id: 'grid_none', label: 'Remove Grid', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'none' }); setActiveCategory('background'); } },
         { id: 'export_png', label: 'Export as PNG', icon: <Download size={18} />, category: 'File', perform: exportCanvasPNG },
         { id: 'clear_canvas', label: 'Clear Canvas', icon: <Trash2 size={18} />, category: 'Danger', perform: clearCanvas },
-        { id: 'new_canvas', label: 'Go to Welcome Screen', icon: <FilePlus size={18} />, category: 'Navigation', perform: () => setShowWelcome(true) },
+        { id: 'new_canvas', label: 'Go to Welcome Screen', icon: <FilePlus size={18} />, category: 'Navigation', perform: () => { setShowWelcome(true); setActiveCategory(null); } },
         { id: 'open_settings', label: 'Open Settings', icon: <Settings size={18} />, category: 'Navigation', perform: () => setShowSettingsSidebar(true) },
 
-        { id: 'tool_pen', label: 'Switch to Pen', icon: <Pen size={18} />, category: 'Tools', perform: () => setActiveTool('pen') },
-        { id: 'tool_eraser', label: 'Switch to Eraser', icon: <Eraser size={18} />, category: 'Tools', perform: () => setActiveTool('eraser') },
-        { id: 'tool_select', label: 'Switch to Selection', icon: <MousePointer size={18} />, category: 'Tools', perform: () => setActiveTool('select') },
-        { id: 'tool_rectangle', label: 'Draw Rectangle', icon: <Square size={18} />, category: 'Tools', perform: () => setActiveTool('rectangle') },
-        { id: 'tool_circle', label: 'Draw Circle', icon: <Circle size={18} />, category: 'Tools', perform: () => setActiveTool('circle') },
-        { id: 'tool_line', label: 'Draw Line', icon: <Minus size={18} />, category: 'Tools', perform: () => setActiveTool('line') },
-        { id: 'tool_arrow', label: 'Draw Arrow', icon: <ArrowRight size={18} />, category: 'Tools', perform: () => setActiveTool('arrow') },
-        { id: 'tool_text', label: 'Add Text', icon: <Type size={18} />, category: 'Tools', perform: () => setShowTextModal(true) },
+        { id: 'tool_pen', label: 'Switch to Pen', icon: <Pen size={18} />, category: 'Tools', perform: () => { setActiveTool('pen'); setActiveCategory('draw'); } },
+        { id: 'tool_eraser', label: 'Switch to Eraser', icon: <Eraser size={18} />, category: 'Tools', perform: () => { setActiveTool('eraser'); setActiveCategory('draw'); } },
+        { id: 'tool_select', label: 'Switch to Selection', icon: <MousePointer size={18} />, category: 'Tools', perform: () => { setActiveTool('select'); setActiveCategory('draw'); } },
+        { id: 'tool_rectangle', label: 'Draw Rectangle', icon: <Square size={18} />, category: 'Tools', perform: () => { setActiveTool('rectangle'); setActiveCategory('shapes'); } },
+        { id: 'tool_circle', label: 'Draw Circle', icon: <Circle size={18} />, category: 'Tools', perform: () => { setActiveTool('circle'); setActiveCategory('shapes'); } },
+        { id: 'tool_line', label: 'Draw Line', icon: <Minus size={18} />, category: 'Tools', perform: () => { setActiveTool('line'); setActiveCategory('shapes'); } },
+        { id: 'tool_arrow', label: 'Draw Arrow', icon: <ArrowRight size={18} />, category: 'Tools', perform: () => { setActiveTool('arrow'); setActiveCategory('shapes'); } },
+        { id: 'tool_text', label: 'Add Text', icon: <Type size={18} />, category: 'Tools', perform: () => { setShowTextModal(true); setActiveCategory('shapes'); } },
 
         // Focus Mode
         { id: 'focus_mode', label: 'Toggle Focus Mode', icon: <Grid size={18} />, category: 'View', perform: () => updateSettings({ focusMode: !settings?.focusMode }) },

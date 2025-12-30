@@ -12,16 +12,26 @@ const SettingsSidebar = () => {
         updateBackground
     } = useWhiteboard();
 
+    const [searchQuery, setSearchQuery] = useState('');
     const isLight = settings.iconTheme === 'light';
 
     if (!showSettingsSidebar) return null;
 
-    const grids = [
-        { id: 'none', label: 'None', icon: <Square size={16} /> },
-        { id: 'dots', label: 'Dots', icon: <Type size={16} /> },
-        { id: 'lines', label: 'Lines', icon: <Layout size={16} /> },
-        { id: 'squares', label: 'Squares', icon: <Grid size={16} /> }
+    const sections = [
+        { id: 'user', label: 'User Profile', tags: ['name', 'author', 'profile'] },
+        { id: 'theme', label: 'Icon Theme', tags: ['dark', 'light', 'appearance'] },
+        { id: 'smoothing', label: 'Stroke Smoothing', tags: ['bezier', 'lines', 'drawing'] },
+        { id: 'grid', label: 'Grid Type', tags: ['background', 'dots', 'lines', 'canvas'] },
+        { id: 'density', label: 'Grid Density', tags: ['size', 'spacing'] },
+        { id: 'shortcuts', label: 'Keyboard Shortcuts', tags: ['keys', 'hotkeys', 'help'] }
     ];
+
+    const isVisible = (id) => {
+        if (!searchQuery) return true;
+        const section = sections.find(s => s.id === id);
+        return section.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            section.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    };
 
     return (
         <div className="settings-sidebar-overlay" style={{
@@ -51,7 +61,7 @@ const SettingsSidebar = () => {
             }} onClick={e => e.stopPropagation()}>
 
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0, color: isLight ? '#000000' : 'white' }}>Settings</h2>
                     <button
                         onClick={() => setShowSettingsSidebar(false)}
@@ -59,6 +69,28 @@ const SettingsSidebar = () => {
                     >
                         <X size={24} />
                     </button>
+                </div>
+
+                {/* Search */}
+                <div style={{ position: 'relative', marginBottom: '24px' }}>
+                    <input
+                        type="text"
+                        placeholder="Search settings..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            paddingLeft: '36px',
+                            background: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(128,128,128,0.2)',
+                            borderRadius: '10px',
+                            color: isLight ? '#000' : '#fff',
+                            fontSize: '14px',
+                            outline: 'none'
+                        }}
+                    />
+                    <X size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
                 </div>
 
                 {/* User Profile */}
@@ -107,115 +139,130 @@ const SettingsSidebar = () => {
                 <div style={{ flex: 1, overflowY: 'auto' }}>
 
                     {/* Icon Theme */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <h3 style={getSectionTitleStyle(isLight)}>Icon Theme</h3>
-                        <div style={{ display: 'flex', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
-                            <button
-                                onClick={() => updateSettings({ iconTheme: 'liquid' })}
-                                style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'liquid' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
-                            >
-                                <Moon size={16} />
-                                <span>Liquid Glass</span>
-                            </button>
-                            <button
-                                onClick={() => updateSettings({ iconTheme: 'light' })}
-                                style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'light' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
-                            >
-                                <Sun size={16} />
-                                <span>Light Mode</span>
-                            </button>
+                    {isVisible('theme') && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Icon Theme</h3>
+                            <div style={{ display: 'flex', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                                <button
+                                    onClick={() => updateSettings({ iconTheme: 'liquid' })}
+                                    style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'liquid' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                >
+                                    <Moon size={16} />
+                                    <span>Liquid Glass</span>
+                                </button>
+                                <button
+                                    onClick={() => updateSettings({ iconTheme: 'light' })}
+                                    style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'light' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                >
+                                    <Sun size={16} />
+                                    <span>Light Mode</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Stroke Smoothing */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <h3 style={getSectionTitleStyle(isLight)}>Stroke Smoothing</h3>
-                        <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
-                            <button
-                                onClick={() => updateSettings({ strokeSmoothing: true })}
-                                style={{ ...getToggleButtonStyle(isLight), background: settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
-                            >
-                                <span>On</span>
-                            </button>
-                            <button
-                                onClick={() => updateSettings({ strokeSmoothing: false })}
-                                style={{ ...getToggleButtonStyle(isLight), background: !settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
-                            >
-                                <span>Off</span>
-                            </button>
+                    {isVisible('smoothing') && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Stroke Smoothing</h3>
+                            <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                                <button
+                                    onClick={() => updateSettings({ strokeSmoothing: true })}
+                                    style={{ ...getToggleButtonStyle(isLight), background: settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                >
+                                    <span>On</span>
+                                </button>
+                                <button
+                                    onClick={() => updateSettings({ strokeSmoothing: false })}
+                                    style={{ ...getToggleButtonStyle(isLight), background: !settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                >
+                                    <span>Off</span>
+                                </button>
+                            </div>
+                            <p style={{ fontSize: '11px', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.4)', marginTop: '8px' }}>
+                                Smoother lines using Bezier curve interpolation
+                            </p>
                         </div>
-                        <p style={{ fontSize: '11px', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.4)', marginTop: '8px' }}>
-                            Smoother lines using Bezier curve interpolation
-                        </p>
-                    </div>
+                    )}
 
                     {/* Grid Type */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <h3 style={getSectionTitleStyle(isLight)}>Grid Type</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                            {grids.map(grid => (
-                                <button
-                                    key={grid.id}
-                                    onClick={() => updateBackground({ gridType: grid.id })}
-                                    style={{
-                                        ...getGridButtonStyle(isLight),
-                                        background: background.gridType === grid.id ? 'rgba(0, 122, 255, 0.2)' : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'),
-                                        border: background.gridType === grid.id ? '1px solid #007AFF' : '1px solid transparent'
-                                    }}
-                                >
-                                    {grid.icon}
-                                    <span>{grid.label}</span>
-                                </button>
-                            ))}
+                    {isVisible('grid') && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Grid Type</h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                                {[
+                                    { id: 'none', label: 'None', icon: <Square size={16} /> },
+                                    { id: 'dots', label: 'Dots', icon: <Type size={16} /> },
+                                    { id: 'lines', label: 'Lines', icon: <Layout size={16} /> },
+                                    { id: 'squares', label: 'Squares', icon: <Grid size={16} /> }
+                                ].map(grid => (
+                                    <button
+                                        key={grid.id}
+                                        onClick={() => updateBackground({ gridType: grid.id })}
+                                        style={{
+                                            ...getGridButtonStyle(isLight),
+                                            background: background.gridType === grid.id ? 'rgba(0, 122, 255, 0.2)' : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'),
+                                            border: background.gridType === grid.id ? '1px solid #007AFF' : '1px solid transparent'
+                                        }}
+                                    >
+                                        {grid.icon}
+                                        <span>{grid.label}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Grid Opacity */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <h3 style={getSectionTitleStyle(isLight)}>Grid Density</h3>
-                        <input
-                            type="range"
-                            min="20"
-                            max="100"
-                            step="10"
-                            value={background.gridSize}
-                            onChange={(e) => updateBackground({ gridSize: parseInt(e.target.value) })}
-                            style={{
-                                width: '100%',
-                                cursor: 'pointer',
-                                accentColor: '#007AFF'
-                            }}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)' }}>
-                            <span>Compact</span>
-                            <span>Sparse</span>
+                    {isVisible('density') && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Grid Density</h3>
+                            <input
+                                type="range"
+                                min="20"
+                                max="100"
+                                step="10"
+                                value={background.gridSize}
+                                onChange={(e) => updateBackground({ gridSize: parseInt(e.target.value) })}
+                                style={{
+                                    width: '100%',
+                                    cursor: 'pointer',
+                                    accentColor: '#007AFF'
+                                }}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)' }}>
+                                <span>Compact</span>
+                                <span>Sparse</span>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Keyboard Shortcuts */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                            <Keyboard size={16} color={isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'} />
-                            <h3 style={{ ...getSectionTitleStyle(isLight), marginBottom: 0 }}>Keyboard Shortcuts</h3>
+                    {isVisible('shortcuts') && (
+                        <div style={{ marginBottom: '32px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                                <Keyboard size={16} color={isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'} />
+                                <h3 style={{ ...getSectionTitleStyle(isLight), marginBottom: 0 }}>Keyboard Shortcuts</h3>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <ShortcutItem label="Command Palette" keys={['Cmd', 'K']} isLight={isLight} />
+                                <ShortcutItem label="Save Canvas" keys={['Ctrl', 'S']} isLight={isLight} />
+                                <ShortcutItem label="Open File" keys={['Ctrl', 'O']} isLight={isLight} />
+                                <ShortcutItem label="Export PNG" keys={['Ctrl', 'E']} isLight={isLight} />
+                                <div style={{ height: '8px' }} />
+                                <ShortcutItem label="Pen Tool" keys={['P']} isLight={isLight} />
+                                <ShortcutItem label="Eraser Tool" keys={['E']} isLight={isLight} />
+                                <ShortcutItem label="Select Tool" keys={['V']} isLight={isLight} />
+                                <ShortcutItem label="Rectangle Tool" keys={['R']} isLight={isLight} />
+                                <ShortcutItem label="Circle Tool" keys={['C']} isLight={isLight} />
+                                <ShortcutItem label="Line Tool" keys={['L']} isLight={isLight} />
+                                <ShortcutItem label="Arrow Tool" keys={['A']} isLight={isLight} />
+                                <div style={{ height: '8px' }} />
+                                <ShortcutItem label="Undo" keys={['Ctrl', 'Z']} isLight={isLight} />
+                                <ShortcutItem label="Redo" keys={['Ctrl', 'Y']} isLight={isLight} />
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ShortcutItem label="Command Palette" keys={['Cmd', 'K']} isLight={isLight} />
-                            <ShortcutItem label="Save Canvas" keys={['Ctrl', 'S']} isLight={isLight} />
-                            <ShortcutItem label="Open File" keys={['Ctrl', 'O']} isLight={isLight} />
-                            <ShortcutItem label="Export PNG" keys={['Ctrl', 'E']} isLight={isLight} />
-                            <div style={{ height: '8px' }} />
-                            <ShortcutItem label="Pen Tool" keys={['P']} isLight={isLight} />
-                            <ShortcutItem label="Eraser Tool" keys={['E']} isLight={isLight} />
-                            <ShortcutItem label="Select Tool" keys={['V']} isLight={isLight} />
-                            <ShortcutItem label="Rectangle Tool" keys={['R']} isLight={isLight} />
-                            <ShortcutItem label="Circle Tool" keys={['C']} isLight={isLight} />
-                            <ShortcutItem label="Line Tool" keys={['L']} isLight={isLight} />
-                            <ShortcutItem label="Arrow Tool" keys={['A']} isLight={isLight} />
-                            <div style={{ height: '8px' }} />
-                            <ShortcutItem label="Undo" keys={['Ctrl', 'Z']} isLight={isLight} />
-                            <ShortcutItem label="Redo" keys={['Ctrl', 'Y']} isLight={isLight} />
-                        </div>
-                    </div>
+                    )}
 
                 </div>
 
@@ -232,7 +279,7 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.6.0-b</span>
+                        <span>Cassini v1.7.1</span>
                     </div>
                 </div>
 

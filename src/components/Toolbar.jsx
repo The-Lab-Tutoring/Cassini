@@ -51,19 +51,15 @@ const Toolbar = () => {
         setElements,
         updateBackground,
         setViewport,
+        activeCategory,
+        setActiveCategory,
+        setShowSettingsSidebar,
         settings,
         updateSettings
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [toolbarOrientation, setToolbarOrientation] = useState('horizontal');
-
-    // Collapsible section states
-    const [showDrawingTools, setShowDrawingTools] = useState(true);
-    const [showShapeTools, setShowShapeTools] = useState(false);
-    const [showColorPanel, setShowColorPanel] = useState(false);
-    const [showSettings, setShowSettings] = useState(false);
-    const [showFileTools, setShowFileTools] = useState(false);
+    const isLight = settings.iconTheme === 'light';
 
     // Responsive sizing
     const [uiScale, setUiScale] = useState(1);
@@ -164,10 +160,10 @@ const Toolbar = () => {
         const isLight = settings.iconTheme === 'light';
         return (
             <div style={{
-                width: toolbarOrientation === 'horizontal' ? '1px' : '80%',
-                height: toolbarOrientation === 'horizontal' ? baseSize * 0.8 : '1px',
+                width: '1px',
+                height: baseSize * 0.8,
                 background: isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.15)',
-                margin: toolbarOrientation === 'horizontal' ? '0 4px' : '4px 0'
+                margin: '0 4px'
             }} />
         );
     };
@@ -205,89 +201,106 @@ const Toolbar = () => {
 
     return (
         <div style={{
-            position: 'absolute',
-            ...(toolbarOrientation === 'horizontal' ? {
-                top: 20,
-                left: '50%',
-                transform: 'translateX(-50%)'
-            } : {
-                top: '50%',
-                left: 20,
-                transform: 'translateY(-50%)'
-            }),
-            zIndex: 1000
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px'
         }}>
-            <div className={`glass ${settings.iconTheme === 'light' ? 'light-glass' : ''}`} style={{
-                padding: 8 * uiScale,
-                borderRadius: 'var(--radius-lg)',
-                display: 'flex',
-                flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column',
-                gap: 4 * uiScale,
-                alignItems: 'center',
-                transition: 'all 0.3s ease',
-                maxWidth: toolbarOrientation === 'horizontal' ? '95vw' : 'none',
-                maxHeight: toolbarOrientation === 'vertical' ? '90vh' : 'none',
-                overflowX: toolbarOrientation === 'horizontal' ? 'auto' : 'visible',
-                overflowY: toolbarOrientation === 'vertical' ? 'auto' : 'visible'
-            }}>
-                {/* Collapse/Orientation Controls */}
-                <div style={{ display: 'flex', gap: 2 }}>
-                    <button
-                        className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`}
-                        onClick={() => setIsCollapsed(true)}
-                        title="Collapse Toolbar"
-                        style={{ width: baseSize * 0.7, height: baseSize * 0.7, padding: 4 }}
-                    >
-                        <ChevronUp size={smallIconSize} />
-                    </button>
-                    <button
-                        className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`}
-                        onClick={() => setToolbarOrientation(prev => prev === 'horizontal' ? 'vertical' : 'horizontal')}
-                        title="Toggle Orientation"
-                        style={{ width: baseSize * 0.7, height: baseSize * 0.7, padding: 4 }}
-                    >
-                        {toolbarOrientation === 'horizontal' ? <ChevronLeft size={smallIconSize} /> : <ChevronRight size={smallIconSize} />}
-                    </button>
-                </div>
-
-                <Divider />
-
-                <Divider />
-
-                {/* File Tools Section */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
-                    <SectionHeader label="File" isOpen={showFileTools} onToggle={() => setShowFileTools(!showFileTools)} icon={FileText} />
-                    {showFileTools && (
+            {/* Secondary Bar (Contextual) */}
+            {!isCollapsed && activeCategory && (
+                <div className={`glass ${settings.iconTheme === 'light' ? 'light-glass' : ''}`} style={{
+                    padding: '8px',
+                    borderRadius: 'var(--radius-lg)',
+                    display: 'flex',
+                    gap: '4px',
+                    alignItems: 'center',
+                    animation: 'slideUp 0.3s ease-out'
+                }}>
+                    {activeCategory === 'draw' && (
+                        <>
+                            {drawingTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                            <Divider />
+                            <div style={{ display: 'flex', gap: '8px', padding: '0 8px' }}>
+                                {colors.map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => updateToolProperty('color', color)}
+                                        style={{
+                                            width: 24,
+                                            height: 24,
+                                            borderRadius: '50%',
+                                            background: color,
+                                            border: toolProperties.color === color
+                                                ? '2px solid white'
+                                                : '2px solid rgba(255, 255, 255, 0.3)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <Divider />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px' }}>
+                                <span style={{ fontSize: '10px', opacity: 0.6 }}>Size</span>
+                                <input
+                                    type="range" min="1" max="50"
+                                    value={toolProperties.thickness}
+                                    onChange={(e) => updateToolProperty('thickness', parseInt(e.target.value))}
+                                    style={{ width: '60px', accentColor: '#007AFF' }}
+                                />
+                            </div>
+                        </>
+                    )}
+                    {activeCategory === 'shapes' && (
+                        <>
+                            {shapeTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                            <Divider />
+                            {measureTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
+                        </>
+                    )}
+                    {activeCategory === 'background' && (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '0 4px' }}>
+                            <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'none' })} style={{ fontSize: '10px' }}>None</button>
+                            <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'dots' })} style={{ fontSize: '10px' }}>Dots</button>
+                            <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'lines' })} style={{ fontSize: '10px' }}>Lines</button>
+                            <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => updateBackground({ gridType: 'squares' })} style={{ fontSize: '10px' }}>Grid</button>
+                            <Divider />
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                                {['#1a1a1a', '#ffffff', '#f5f5f7', '#000000'].map(bg => (
+                                    <button
+                                        key={bg}
+                                        onClick={() => updateBackground({ backgroundColor: bg })}
+                                        style={{
+                                            width: 20, height: 20, borderRadius: '4px', background: bg,
+                                            border: background.backgroundColor === bg ? '2px solid #007AFF' : '1px solid rgba(255,255,255,0.2)',
+                                            cursor: 'pointer'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {activeCategory === 'file' && (
                         <>
                             <ToolButton
                                 tool={{
                                     id: 'new',
                                     icon: FilePlus,
                                     label: 'New Canvas',
-                                    action: () => {
-                                        if (window.confirm('Are you sure you want to create a new canvas? Unsaved changes will be lost.')) {
-                                            clearCanvas();
-                                        }
-                                    }
+                                    action: () => window.confirm('New canvas?') && clearCanvas()
                                 }}
                             />
                             <ToolButton
                                 tool={{
                                     id: 'save',
                                     icon: Save,
-                                    label: 'Save (Ctrl+S)',
-                                    action: () => {
-                                        const data = {
-                                            version: '1.5.3',
-                                            name: 'My Whiteboard',
-                                            author: settings.userName,
-                                            timestamp: new Date().toISOString(),
-                                            elements,
-                                            background,
-                                            viewport
-                                        };
-                                        saveWhiteboard(data, `cassini-${settings.userName.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}`);
-                                    }
+                                    label: 'Save',
+                                    action: () => saveWhiteboard({ elements, background, viewport, author: settings.userName }, 'whiteboard')
                                 }}
                             />
                             <div style={{ position: 'relative' }}>
@@ -308,7 +321,7 @@ const Toolbar = () => {
                                                 alert(error.message);
                                             }
                                         }
-                                        e.target.value = null; // Reset input
+                                        e.target.value = null;
                                     }}
                                     style={{ display: 'none' }}
                                 />
@@ -316,7 +329,7 @@ const Toolbar = () => {
                                     tool={{
                                         id: 'open',
                                         icon: FolderOpen,
-                                        label: 'Open (Ctrl+O)',
+                                        label: 'Open',
                                         action: () => document.getElementById('toolbar-file-input').click()
                                     }}
                                 />
@@ -329,160 +342,82 @@ const Toolbar = () => {
                                     action: exportCanvasPNG
                                 }}
                             />
+                            <ToolButton
+                                tool={{
+                                    id: 'import-img',
+                                    icon: Upload,
+                                    label: 'Import Image',
+                                    action: importImage
+                                }}
+                            />
                         </>
                     )}
                 </div>
+            )}
 
-                {/* Drawing Tools Section */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
-                    <SectionHeader label="Draw" isOpen={showDrawingTools} onToggle={() => setShowDrawingTools(!showDrawingTools)} icon={Pen} />
-                    {showDrawingTools && drawingTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
-                </div>
-
-                {/* Shape Tools Section */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
-                    <SectionHeader label="Shapes" isOpen={showShapeTools} onToggle={() => setShowShapeTools(!showShapeTools)} icon={Shapes} />
-                    {showShapeTools && shapeTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
-                    {showShapeTools && measureTools.map(tool => <ToolButton key={tool.id} tool={tool} />)}
-                </div>
-
+            {/* Main Bar */}
+            <div className={`glass ${settings.iconTheme === 'light' ? 'light-glass' : ''}`} style={{
+                padding: '8px',
+                borderRadius: 'var(--radius-xl)',
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+            }}>
+                <CategoryButton id="draw" icon={Pen} label="Draw" />
+                <CategoryButton id="shapes" icon={Shapes} label="Shapes" />
+                <CategoryButton id="background" icon={Grid} label="Canvas" />
+                <CategoryButton id="file" icon={FileText} label="File" />
                 <Divider />
-
-                {/* Color Panel Section */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
-                    <SectionHeader label="Color" isOpen={showColorPanel} onToggle={() => setShowColorPanel(!showColorPanel)} icon={Palette} />
-                    {showColorPanel && (
-                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                            {colors.map(color => (
-                                <button
-                                    key={color}
-                                    onClick={() => updateToolProperty('color', color)}
-                                    style={{
-                                        width: 24 * uiScale,
-                                        height: 24 * uiScale,
-                                        borderRadius: '50%',
-                                        background: color,
-                                        border: toolProperties.color === color
-                                            ? '2px solid white'
-                                            : '2px solid rgba(255, 255, 255, 0.3)',
-                                        cursor: 'pointer',
-                                        transition: 'all var(--transition-fast)',
-                                        boxShadow: toolProperties.color === color
-                                            ? '0 0 0 2px rgba(0, 122, 255, 0.5)'
-                                            : 'none'
-                                    }}
-                                    title={color}
-                                />
-                            ))}
-                            <input
-                                type="color"
-                                value={toolProperties.color}
-                                onChange={(e) => updateToolProperty('color', e.target.value)}
-                                style={{
-                                    width: 24 * uiScale,
-                                    height: 24 * uiScale,
-                                    borderRadius: '4px',
-                                    border: '2px solid rgba(255, 255, 255, 0.3)',
-                                    cursor: 'pointer',
-                                    background: 'transparent'
-                                }}
-                                title="Custom Color"
-                            />
-                        </div>
-                    )}
-                </div>
-
-                {/* Settings Section (Size/Opacity) */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4, alignItems: 'center' }}>
-                    <SectionHeader label="Settings" isOpen={showSettings} onToggle={() => setShowSettings(!showSettings)} icon={Settings2} />
-                    {showSettings && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 8px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <label style={{ fontSize: 10 * uiScale, color: settings.iconTheme === 'light' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
-                                    Size: {toolProperties.thickness}px
-                                </label>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="20"
-                                    value={toolProperties.thickness}
-                                    onChange={(e) => updateToolProperty('thickness', parseInt(e.target.value))}
-                                    style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <label style={{ fontSize: 10 * uiScale, color: settings.iconTheme === 'light' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
-                                    Opacity: {Math.round(toolProperties.opacity * 100)}%
-                                </label>
-                                <input
-                                    type="range"
-                                    min="0.1"
-                                    max="1"
-                                    step="0.1"
-                                    value={toolProperties.opacity}
-                                    onChange={(e) => updateToolProperty('opacity', parseFloat(e.target.value))}
-                                    style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
-                                />
-                            </div>
-                            {['rectangle', 'circle'].includes(activeTool) && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                    <label style={{ fontSize: 10 * uiScale, color: settings.iconTheme === 'light' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
-                                        Fill: {Math.round(toolProperties.fillOpacity * 100)}%
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="1"
-                                        step="0.1"
-                                        value={toolProperties.fillOpacity}
-                                        onChange={(e) => updateToolProperty('fillOpacity', parseFloat(e.target.value))}
-                                        style={{ width: 80 * uiScale, accentColor: 'var(--accent-blue)' }}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
+                <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={undo} title="Undo"><Undo size={iconSize} /></button>
+                <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={redo} title="Redo"><Redo size={iconSize} /></button>
                 <Divider />
-
-                {/* Action Buttons - Always Visible */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4 }}>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={undo} title="Undo" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Undo size={iconSize} />
-                    </button>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={redo} title="Redo" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Redo size={iconSize} />
-                    </button>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={clearCanvas} title="Clear All" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Trash2 size={iconSize} />
-                    </button>
-                </div>
-
-                <Divider />
-
-                {/* Export/Import/Grid - Always Visible */}
-                <div style={{ display: 'flex', flexDirection: toolbarOrientation === 'horizontal' ? 'row' : 'column', gap: 4 }}>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={exportCanvasPNG} title="Export PNG" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Download size={iconSize} />
-                    </button>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={importImage} title="Import Image" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Upload size={iconSize} />
-                    </button>
-                    <button className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''}`} onClick={() => setShowBackgroundModal(true)} title="Background" style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}>
-                        <Grid size={iconSize} />
-                    </button>
-                    <button
-                        className={`glass-button ${settings.iconTheme === 'light' ? 'light-icons' : ''} ${settings?.focusMode ? 'active' : ''}`}
-                        onClick={() => updateSettings({ focusMode: !settings?.focusMode })}
-                        title="Focus Mode (F)"
-                        style={{ width: baseSize, height: baseSize, padding: baseSize * 0.2 }}
-                    >
-                        <Eye size={iconSize} />
-                    </button>
-                </div>
+                <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => setShowSettingsSidebar(true)} title="Settings"><Settings2 size={iconSize} /></button>
+                <button
+                    className={`glass-button ${isLight ? 'light-icons' : ''} ${settings?.focusMode ? 'active' : ''}`}
+                    onClick={() => updateSettings({ focusMode: !settings?.focusMode })}
+                    title="Focus Mode (F)"
+                >
+                    <Eye size={iconSize} />
+                </button>
             </div>
+
+            <style>{`
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </div>
+    );
+};
+
+const CategoryButton = ({ id, icon: Icon, label }) => {
+    const { activeCategory, setActiveCategory, settings } = useWhiteboard();
+    const isLight = settings.iconTheme === 'light';
+    const isActive = activeCategory === id;
+
+    return (
+        <button
+            onClick={() => setActiveCategory(prev => prev === id ? null : id)}
+            style={{
+                background: isActive ? (isLight ? 'rgba(0, 122, 255, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: '8px 12px',
+                color: isActive ? '#007AFF' : (isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)'),
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderBottom: isActive ? '2px solid #007AFF' : '2px solid transparent'
+            }}
+            className="category-btn"
+        >
+            <Icon size={18} />
+            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.3px' }}>{label}</span>
+        </button>
     );
 };
 

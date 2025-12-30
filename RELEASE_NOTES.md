@@ -1,8 +1,23 @@
 # Cassini - Release Notes
 
+## [1.7.1] - 2025-12-29
+
+### Phase 1: Full UI Revamp
+
+- **Bottom-Anchored Toolbar**: Completely redesigned the core navigation to be bottom-centered, maximizing workspace and following modern "liquid glass" aesthetics.
+- **Stacked Secondary Bars**: Category switching (Draw, Shapes, Canvas, File) now reveals a contextual secondary bar *above* the main navigation.
+- **Searchable Settings Sidebar**: Added a search-first settings experience with real-time filtering and category tags.
+- **State Synchronization**: Unified `activeCategory` state across the context, toolbar, and command palette for a seamless switching experience.
+- **Bug Fixes**:
+  - Resolved `isLight` and `toolbarOrientation` reference errors in the new toolbar architecture.
+  - Fixed `Grid` icon prop mismatch in settings sidebar.
+  - Corrected settings button behavior in both the toolbar and branding footer.
+
+---
+
 ## [1.6.0-b] - 2025-12-29
 
-### Light Mode Refinements
+### Light Mode Refinements (v1.6.0-b)
 
 - **Automatic Background Sync**: Canvas background now automatically switches to white when Light Mode is selected, and back to dark when Liquid Glass is selected.
 - **Improved Settings Sidebar**: Sidebar UI now fully adapts to Light Mode with high-contrast text, borders, and a translucent white background.
@@ -16,14 +31,14 @@
 
 This major update focuses on refining the individual creative workflow, removing distractions, and ensuring your work is always safe.
 
-### Added
+### Added in 1.6.0
 
 - **Auto-Save**: Your work is automatically saved to local storage every 60 seconds. A "Recover Last Session" option appears on the Welcome Screen if a session was closed unexpectedly.
 - **Focus Mode**: Press `F` or click the Eye icon in the toolbar to hide all UI elements for a pure drawing experience. Floating button allows easy exit.
 - **Stroke Smoothing**: New setting in the sidebar to toggle Bezier curve smoothing for cleaner, more natural freehand lines.
 - **Logo in Settings**: Added branding to the settings footer.
 
-### Removed
+### Removed in 1.6.0
 
 - **Layers System**: Removed the layers panel to simplify the interface and focus on speed and direct manipulation.
 
@@ -31,7 +46,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 ## [1.5.3] - 2025-12-22
 
-### Added
+### Added in 1.5.3
 
 - **User Onboarding**: Personalized experience with a name input field on the Welcome Screen.
 - **Settings Sidebar**: Centralized control for user profile, grid customization, and themes.
@@ -41,7 +56,7 @@ This major update focuses on refining the individual creative workflow, removing
 - **Metadata Support**: Exported files now include author name and timestamp.
 - **Smart Export Naming**: Files are now saved with descriptive names (username + date).
 
-### Improved
+### Improved in 1.5.3
 
 - **Author Persistence**: Importing a file now restores the original author's name to the settings.
 - **UI Consistency**: Every icon in the toolbar and branding now respects the selected icon theme.
@@ -51,13 +66,13 @@ This major update focuses on refining the individual creative workflow, removing
 
 ## [1.5.2] - 2025-12-21
 
-### Added
+### Added in 1.5.2
 
 - **Smart Connectors (Beta)**: Lines and Arrows now snap to anchor points on Rectangles and Circles.
 - **Sticky Connections**: Moving a shape automatically updates any lines connected to its anchor points.
 - **Visual Anchors**: Anchor points now appear when using connector tools for precision placement.
 
-### Removed
+### Removed in 1.5.2
 
 - **Gemini AI Assistant**: Removed the built-in AI chat sidebar and associated services to streamline the creative experience.
 - AI-related documentation and branding ("Assistant").
@@ -68,7 +83,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 **Release Date:** December 21, 2024
 
-### 🚀 Improvements
+### 🚀 Improvements in 1.5.0.1
 
 - **Horizontal Color Picker** - Corrected the color palette layout to ensure it always expands horizontally, matching the "floating bar" aesthetic.
 
@@ -78,7 +93,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 **Release Date:** December 21, 2024
 
-### 🚀 Improvements
+### 🚀 Improvements in 1.5.0
 
 - **README Refactor** - Transformed `README.md` into a professional introductory landing page.
 - **Workflow Optimization** - Removed version history from README to consolidate it in `RELEASE_NOTES.md`, streamlining future updates.
