@@ -3,6 +3,10 @@ import { useWhiteboard } from '../context/WhiteboardContext';
 import { snapToRulerEdge, pointInRect } from '../utils/geometry';
 import SelectionToolbar from './SelectionToolbar';
 import SelectionIndicator from './SelectionIndicator';
+import SelectionActionMenu from './SelectionActionMenu';
+import StickyModal from './StickyModal';
+import FrameModal from './FrameModal';
+import ZoomControls from './ZoomControls';
 
 import { saveWhiteboard } from '../utils/fileUtils';
 
@@ -22,6 +26,7 @@ const getAnchors = (element) => {
 const Whiteboard = () => {
     const canvasRef = useRef(null);
     const currentPathRef = useRef([]);
+    const imageCache = useRef(new Map());
     const [isDrawing, setIsDrawing] = useState(false);
     const [draggedElement, setDraggedElement] = useState(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -65,7 +70,9 @@ const Whiteboard = () => {
         deselectAll,
         background,
         settings,
-        updateSettings
+        updateSettings,
+        setShowStickyModal,
+        setShowFrameModal
     } = useWhiteboard();
 
     // Initialize canvas
@@ -391,6 +398,15 @@ const Whiteboard = () => {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
+        // Apply rotation if present
+        if (element.rotation) {
+            const centerX = element.x + element.width / 2;
+            const centerY = element.y + element.height / 2;
+            ctx.translate(centerX, centerY);
+            ctx.rotate(element.rotation * Math.PI / 180);
+            ctx.translate(-centerX, -centerY);
+        }
+
         if (element.type === 'rectangle') {
             // Draw fill if present
             if (element.fillColor && element.fillOpacity > 0) {
@@ -451,26 +467,133 @@ const Whiteboard = () => {
         ctx.restore();
     };
 
-    const drawImage = (ctx, element) => {
-        const img = new Image();
-        img.onload = () => {
-            ctx.save();
-            ctx.globalAlpha = element.opacity || 1;
+    const drawSticky = (ctx, element) => {
+        ctx.save();
+        ctx.globalAlpha = element.opacity || 1;
 
-            // Apply rotation if present
-            if (element.rotation) {
-                const centerX = element.x + element.width / 2;
-                const centerY = element.y + element.height / 2;
-                ctx.translate(centerX, centerY);
-                ctx.rotate(element.rotation * Math.PI / 180);
-                ctx.translate(-centerX, -centerY);
+        // Shadow for depth
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+
+        // Note background
+        ctx.fillStyle = element.color || '#FFEB3B';
+        const radius = 5;
+        const x = element.x;
+        const y = element.y;
+        const w = element.width;
+        const h = element.height;
+
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Reset shadow for text
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Render text
+        if (element.text) {
+            ctx.fillStyle = '#333333';
+            ctx.font = `${element.fontSize || 16}px Inter`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Simple text wrapping for sticky
+            const padding = 20;
+            const maxWidth = w - padding * 2;
+            const words = element.text.split(' ');
+            let line = '';
+            let lines = [];
+            const lineHeight = (element.fontSize || 16) * 1.2;
+
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = ctx.measureText(testLine);
+                let testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    lines.push(line);
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
+                }
             }
+            lines.push(line);
 
-            ctx.drawImage(img, element.x, element.y, element.width, element.height);
-            ctx.globalAlpha = 1;
-            ctx.restore();
-        };
-        img.src = element.src;
+            const totalTextHeight = lines.length * lineHeight;
+            let startY = y + (h - totalTextHeight) / 2 + lineHeight / 2;
+
+            lines.forEach((l, i) => {
+                ctx.fillText(l.trim(), x + w / 2, startY + i * lineHeight);
+            });
+        }
+
+        ctx.restore();
+    };
+
+    const drawFrame = (ctx, element) => {
+        ctx.save();
+        ctx.globalAlpha = element.opacity || 1;
+
+        // Frame background (semi-transparent)
+        ctx.fillStyle = element.color || 'rgba(0, 122, 255, 0.05)';
+        ctx.fillRect(element.x, element.y, element.width, element.height);
+
+        // Frame border (dashed)
+        ctx.strokeStyle = '#007AFF';
+        ctx.lineWidth = 2 / viewport.scale;
+        ctx.setLineDash([10 / viewport.scale, 5 / viewport.scale]);
+        ctx.strokeRect(element.x, element.y, element.width, element.height);
+        ctx.setLineDash([]);
+
+        // Label
+        ctx.fillStyle = '#007AFF';
+        ctx.font = `bold ${14 / viewport.scale}px Inter`;
+        ctx.fillText(element.name || 'Frame', element.x + 5 / viewport.scale, element.y - 10 / viewport.scale);
+
+        ctx.restore();
+    };
+
+    const drawImage = (ctx, element) => {
+        if (!element.src) return;
+
+        let img = imageCache.current.get(element.src);
+        if (!img) {
+            img = new Image();
+            img.src = element.src;
+            img.onload = () => {
+                imageCache.current.set(element.src, img);
+                redrawCanvas(); // Force redraw once loaded
+            };
+            return; // Don't draw yet
+        }
+
+        ctx.save();
+        ctx.globalAlpha = element.opacity || 1;
+
+        // Apply rotation if present
+        if (element.rotation) {
+            const centerX = element.x + element.width / 2;
+            const centerY = element.y + element.height / 2;
+            ctx.translate(centerX, centerY);
+            ctx.rotate(element.rotation * Math.PI / 180);
+            ctx.translate(-centerX, -centerY);
+        }
+
+        ctx.drawImage(img, element.x, element.y, element.width, element.height);
+        ctx.globalAlpha = 1;
+        ctx.restore();
     };
 
     // Get resize handle positions for an element
@@ -499,12 +622,23 @@ const Whiteboard = () => {
     const getHandleAtPoint = (pos, element) => {
         if (element.type !== 'image' && !['rectangle', 'circle'].includes(element.type)) return null;
 
+        let checkPos = { ...pos };
+        if (element.rotation) {
+            const centerX = element.x + element.width / 2;
+            const centerY = element.y + element.height / 2;
+            const angleRad = -element.rotation * Math.PI / 180; // Inverse rotation
+            const dx = pos.x - centerX;
+            const dy = pos.y - centerY;
+            checkPos.x = centerX + dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
+            checkPos.y = centerY + dx * Math.sin(angleRad) + dy * Math.cos(angleRad);
+        }
+
         const handles = getResizeHandles(element);
-        const handleSize = 12; // Hit area slightly larger than visual
+        const handleSize = 12;
 
         for (const [name, handle] of Object.entries(handles)) {
-            if (pos.x >= handle.x - handleSize / 2 && pos.x <= handle.x + handleSize * 1.5 &&
-                pos.y >= handle.y - handleSize / 2 && pos.y <= handle.y + handleSize * 1.5) {
+            if (checkPos.x >= handle.x - handleSize / 2 && checkPos.x <= handle.x + handleSize * 1.5 &&
+                checkPos.y >= handle.y - handleSize / 2 && checkPos.y <= handle.y + handleSize * 1.5) {
                 return name;
             }
         }
@@ -682,12 +816,37 @@ const Whiteboard = () => {
                 width: element.width,
                 height: element.height
             };
+        } else if (element.type === 'sticky') {
+            bounds = {
+                x: element.x,
+                y: element.y,
+                width: element.width,
+                height: element.height
+            };
+        } else if (element.type === 'frame') {
+            bounds = {
+                x: element.x,
+                y: element.y,
+                width: element.width,
+                height: element.height
+            };
         }
 
         if (bounds) {
+            ctx.save();
+
+            // Apply rotation for selection box and handles
+            if (element.rotation) {
+                const centerX = bounds.x + bounds.width / 2;
+                const centerY = bounds.y + bounds.height / 2;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(element.rotation * Math.PI / 180);
+                ctx.translate(-centerX, -centerY);
+            }
+
             ctx.strokeStyle = '#007AFF';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 2 / viewport.scale;
+            ctx.setLineDash([5 / viewport.scale, 5 / viewport.scale]);
             ctx.strokeRect(bounds.x - 5, bounds.y - 5, bounds.width + 10, bounds.height + 10);
             ctx.setLineDash([]);
 
@@ -695,6 +854,8 @@ const Whiteboard = () => {
             if (element.type === 'image' || ['rectangle', 'circle'].includes(element.type)) {
                 drawResizeHandles(ctx, element);
             }
+
+            ctx.restore();
         }
     };
 
@@ -776,6 +937,10 @@ const Whiteboard = () => {
                 drawShape(ctx, element);
             } else if (element.type === 'image') {
                 drawImage(ctx, element);
+            } else if (element.type === 'sticky') {
+                drawSticky(ctx, element);
+            } else if (element.type === 'frame') {
+                drawFrame(ctx, element);
             }
         });
 
@@ -841,6 +1006,19 @@ const Whiteboard = () => {
     };
 
     const isPointNearElement = (pos, element) => {
+        let checkPos = { ...pos };
+
+        // Inverse rotation for accurate hit detection on rotated elements
+        if (element.rotation && (element.type === 'image' || ['rectangle', 'circle'].includes(element.type))) {
+            const centerX = element.x + element.width / 2;
+            const centerY = element.y + element.height / 2;
+            const angleRad = -element.rotation * Math.PI / 180;
+            const dx = pos.x - centerX;
+            const dy = pos.y - centerY;
+            checkPos.x = centerX + dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
+            checkPos.y = centerY + dx * Math.sin(angleRad) + dy * Math.cos(angleRad);
+        }
+
         if (element.type === 'stroke') {
             return element.points.some(p =>
                 Math.hypot(p.x - pos.x, p.y - pos.y) < toolProperties.thickness + 10
@@ -850,14 +1028,14 @@ const Whiteboard = () => {
             const ctx = canvas.getContext('2d');
             ctx.font = `${element.fontSize}px ${element.fontFamily} `;
             const metrics = ctx.measureText(element.text);
-            return pointInRect(pos.x, pos.y, {
+            return pointInRect(checkPos.x, checkPos.y, {
                 x: element.x,
                 y: element.y - element.fontSize,
                 width: metrics.width,
                 height: element.fontSize
             });
         } else if (element.type === 'equation') {
-            return pointInRect(pos.x, pos.y, {
+            return pointInRect(checkPos.x, checkPos.y, {
                 x: element.x,
                 y: element.y,
                 width: element.width,
@@ -871,15 +1049,32 @@ const Whiteboard = () => {
             const maxY = Math.max(element.y, element.y + element.height);
 
             // Add padding for easier selection
-            return pos.x >= minX - 10 && pos.x <= maxX + 10 &&
-                pos.y >= minY - 10 && pos.y <= maxY + 10;
+            return checkPos.x >= minX - 10 && checkPos.x <= maxX + 10 &&
+                checkPos.y >= minY - 10 && checkPos.y <= maxY + 10;
         } else if (element.type === 'image') {
-            return pointInRect(pos.x, pos.y, {
+            return pointInRect(checkPos.x, checkPos.y, {
                 x: element.x,
                 y: element.y,
                 width: element.width,
                 height: element.height
             });
+        } else if (element.type === 'sticky') {
+            return pointInRect(checkPos.x, checkPos.y, {
+                x: element.x,
+                y: element.y,
+                width: element.width,
+                height: element.height
+            });
+        } else if (element.type === 'frame') {
+            // Frame selection: check if near border or label
+            const nearBorder = (
+                (Math.abs(checkPos.x - element.x) < 10 || Math.abs(checkPos.x - (element.x + element.width)) < 10) &&
+                checkPos.y >= element.y && checkPos.y <= element.y + element.height
+            ) || (
+                    (Math.abs(checkPos.y - element.y) < 10 || Math.abs(checkPos.y - (element.y + element.height)) < 10) &&
+                    checkPos.x >= element.x && checkPos.x <= element.x + element.width
+                );
+            return nearBorder;
         }
         return false;
     };
@@ -994,7 +1189,7 @@ const Whiteboard = () => {
                 startAngle: 0,
                 endAngle: Math.PI
             });
-        } else if (['rectangle', 'circle', 'line', 'arrow'].includes(activeTool)) {
+        } else if (['rectangle', 'circle', 'line', 'arrow', 'sticky', 'frame'].includes(activeTool)) {
             setIsDrawing(true);
             let startX = pos.x;
             let startY = pos.y;
@@ -1034,11 +1229,12 @@ const Whiteboard = () => {
                 startY: startY,
                 boundStartId,
                 boundStartSide,
-                color: toolProperties.color,
+                color: activeTool === 'sticky' ? toolProperties.stickyColor : toolProperties.color,
                 thickness: toolProperties.thickness,
                 opacity: toolProperties.opacity,
                 fillColor: toolProperties.fillColor,
-                fillOpacity: toolProperties.fillOpacity
+                fillOpacity: activeTool === 'frame' ? 0.1 : toolProperties.fillOpacity,
+                name: activeTool === 'frame' ? `Frame ${elements.filter(el => el.type === 'frame').length + 1}` : undefined
             });
         }
     };
@@ -1366,10 +1562,19 @@ const Whiteboard = () => {
         if (isDrawing && currentShape) {
             // Only add if it has some size
             if (Math.abs(currentShape.width) > 5 || Math.abs(currentShape.height) > 5) {
+                const newElementId = Date.now();
                 addElement({
-                    id: Date.now(),
+                    id: newElementId,
                     ...currentShape
                 });
+
+                if (currentShape.type === 'sticky') {
+                    setSelectedElement({ id: newElementId, ...currentShape });
+                    setShowStickyModal(true);
+                } else if (currentShape.type === 'frame') {
+                    setSelectedElement({ id: newElementId, ...currentShape });
+                    setShowFrameModal(true);
+                }
             }
             setCurrentShape(null);
         }
@@ -1398,6 +1603,16 @@ const Whiteboard = () => {
         selectedElements.forEach(el => deleteElement(el.id));
         setSelectedElements([]);
         setSelectedElement(null);
+    };
+
+    const handleEditElement = (element) => {
+        if (element.type === 'sticky') {
+            setSelectedElement(element);
+            setShowStickyModal(true);
+        } else if (element.type === 'frame') {
+            setSelectedElement(element);
+            setShowFrameModal(true);
+        }
     };
 
     // Calculate action menu position
@@ -1448,8 +1663,19 @@ const Whiteboard = () => {
                     onUpdateElements={(id, updates) => updateElement(id, updates)}
                 />
             )}
+            {selectedElements.length > 0 && !isDrawing && !isResizing && (
+                <SelectionActionMenu
+                    selectedElements={selectedElements}
+                    onDelete={handleDeleteSelected}
+                    onEdit={handleEditElement}
+                    position={getActionMenuPosition()}
+                />
+            )}
             <SelectionIndicator count={selectedElements.length} />
 
+            <StickyModal />
+            <FrameModal />
+            <ZoomControls />
         </>
     );
 };

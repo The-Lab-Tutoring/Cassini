@@ -4,29 +4,16 @@ import { Clock } from 'lucide-react';
 
 const SessionTimer = () => {
     const { settings } = useWhiteboard();
-    const [seconds, setSeconds] = useState(0);
+    const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setSeconds(s => s + 1);
+            setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
         }, 1000);
         return () => clearInterval(interval);
     }, []);
 
-    if (!settings.showTimer) return null;
-
-    const formatTime = (totalSeconds) => {
-        const hrs = Math.floor(totalSeconds / 3600);
-        const mins = Math.floor((totalSeconds % 3600) / 60);
-        const secs = totalSeconds % 60;
-
-        const parts = [];
-        if (hrs > 0) parts.push(hrs.toString().padStart(2, '0'));
-        parts.push(mins.toString().padStart(2, '0'));
-        parts.push(secs.toString().padStart(2, '0'));
-
-        return parts.join(':');
-    };
+    if (!settings.showClock) return null;
 
     const isLight = settings.iconTheme === 'light';
 
@@ -53,7 +40,7 @@ const SessionTimer = () => {
             letterSpacing: '0.02em'
         }}>
             <Clock size={14} style={{ opacity: 0.7 }} />
-            <span style={{ minWidth: '45px' }}>{formatTime(seconds)}</span>
+            <span style={{ minWidth: '45px' }}>{time}</span>
         </div>
     );
 };

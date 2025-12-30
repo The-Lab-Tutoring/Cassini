@@ -30,7 +30,9 @@ import {
     FilePlus,
     Eye,
     Image as ImageIcon,
-    Box
+    Box,
+    StickyNote,
+    Layout
 } from 'lucide-react';
 import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
@@ -58,6 +60,8 @@ const Toolbar = () => {
         activeCategory,
         setActiveCategory,
         setShowSettingsSidebar,
+        setShowStickyModal,
+        setShowFrameModal,
         settings,
         updateSettings
     } = useWhiteboard();
@@ -101,6 +105,11 @@ const Toolbar = () => {
     const measureTools = [
         { id: 'ruler', icon: Ruler, label: 'Ruler' },
         { id: 'protractor', icon: CircleIcon, label: 'Protractor' },
+    ];
+
+    const organizeTools = [
+        { id: 'sticky', icon: StickyNote, label: 'Sticky Note' },
+        { id: 'frame', icon: Layout, label: 'Frame' },
     ];
 
     const colors = [
@@ -398,6 +407,14 @@ const Toolbar = () => {
                             />
                         </>
                     )}
+
+                    {activeCategory === 'organize' && (
+                        <>
+                            {organizeTools.map(tool => (
+                                <ToolButton key={tool.id} tool={tool} />
+                            ))}
+                        </>
+                    )}
                 </div>
             )}
 
@@ -412,6 +429,7 @@ const Toolbar = () => {
             }}>
                 <CategoryButton id="draw" icon={Pen} label="Draw" />
                 <CategoryButton id="shapes" icon={Shapes} label="Shapes" />
+                <CategoryButton id="organize" icon={Layout} label="Organize" />
                 <CategoryButton id="background" icon={Grid} label="Canvas" />
                 <CategoryButton id="file" icon={FileText} label="File" />
                 <Divider />

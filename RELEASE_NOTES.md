@@ -1,5 +1,18 @@
 # Cassini - Release Notes
 
+## [1.7.3] - 2025-12-29
+
+### Phase 3: The Power Media & Organization
+
+- **Sticky Notes**: Vibrant, color-coded sticky notes for rapid ideation and moodboarding.
+- **Frames (Artboards)**: Defined named regions to structure and containerize project sections.
+- **Precision Zoom**: New bottom-right controls with high-fidelity centered zoom behavior.
+- **System Clock**: Renamed and pivoted the session timer to a persistent system clock for better context.
+- **Enhanced Command Palette**: Integrated all new Phase 2 & 3 features (Zoom, Frames, Stickies, Snapping, Clock) into the Cmd+K interface.
+- **Image Manipulation Fix**: Resolved critical issues where images would "stick" and couldn't be resized/rotated. Implemented a synchronous image cache for butter-smooth interaction.
+- **Geometric Performance**: Refactored hit detection to be rotation-aware across all shapes and images.
+- **UI Refinements**: Adjusted selection toolbar positioning for a clutter-free bottom-right experience.
+
 ## [1.7.2] - 2025-12-29
 
 ### Phase 2: The Power Utilities

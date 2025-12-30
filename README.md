@@ -9,13 +9,15 @@
 ### 🎨 Creative Workspace
 
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
+- **Sticky Notes & Frames** - Organize your thoughts with vibrant stickies and containerize project sections with named artboards.
 - **Stacked Navigation** - New bottom-anchored toolbar with contextual secondary bars for a cleaner, modern workflow.
-- **Searchable Sidebar** - Enhanced settings experience with real-time filtering and category tagging.
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
 - **Dynamic Themes** - Apple-inspired "Liquid Glass" and "High-Contrast Light Mode" with automatic canvas background syncing.
 
 - **Professional Export** - High-quality PNG, SVG (Vector), and PDF export options.
-- **Session Timer** - Floating session duration tracker to monitor development or study time.
+- **System Clock** - Persistent floating clock to monitor local time while in the flow.
+- **Precision Zoom** - Bottom-right controls with anchored centered zoom behavior.
+- **Enhanced Image Engine** - Synchronous image caching and rotation-aware hit detection for smooth manipulation.
 - **Grid Snapping** - Precise element alignment with toggleable grid/ruler snapping.
 - **Text-Rich UI** - Streamlined file management with clear text-based labels in the toolbar.
 - **Keyboard Mastery** - Extensive shortcuts for power users (P for Pen, Cmd+K for Palette, etc.).

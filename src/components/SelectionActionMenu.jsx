@@ -1,7 +1,6 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit2 } from 'lucide-react';
 
-const SelectionActionMenu = ({ selectedElements, onDelete, position }) => {
+const SelectionActionMenu = ({ selectedElements, onDelete, onEdit, position }) => {
     if (!selectedElements || selectedElements.length === 0) return null;
 
     return (
@@ -35,6 +34,24 @@ const SelectionActionMenu = ({ selectedElements, onDelete, position }) => {
             >
                 <Trash2 size={18} />
             </button>
+            {selectedElements.length === 1 && (selectedElements[0].type === 'sticky' || selectedElements[0].type === 'frame') && (
+                <button
+                    className="glass-button"
+                    onClick={() => onEdit(selectedElements[0])}
+                    title="Edit"
+                    style={{
+                        width: '36px',
+                        height: '36px',
+                        padding: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(0, 122, 255, 0.2)'
+                    }}
+                >
+                    <Edit2 size={18} />
+                </button>
+            )}
             <div style={{
                 fontSize: '11px',
                 color: 'rgba(255, 255, 255, 0.7)',

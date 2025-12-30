@@ -27,7 +27,8 @@ export const WhiteboardProvider = ({ children }) => {
         opacity: 1,
         fillOpacity: 0.5,
         fontSize: 16,
-        fontFamily: 'Inter'
+        fontFamily: 'Inter',
+        stickyColor: '#FFEB3B' // Default yellow
     });
 
     // Canvas elements
@@ -46,6 +47,8 @@ export const WhiteboardProvider = ({ children }) => {
     const [showEquationModal, setShowEquationModal] = useState(false);
     const [showTextModal, setShowTextModal] = useState(false);
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+    const [showStickyModal, setShowStickyModal] = useState(false);
+    const [showFrameModal, setShowFrameModal] = useState(false);
     const [showSettingsSidebar, setShowSettingsSidebar] = useState(false);
     const [showWelcome, setShowWelcome] = useState(true);
 
@@ -56,7 +59,7 @@ export const WhiteboardProvider = ({ children }) => {
         strokeSmoothing: true,
         focusMode: false,
         gridSnapping: false,
-        showTimer: true
+        showClock: true
     });
 
     // Viewport state for Infinite Canvas
@@ -77,11 +80,29 @@ export const WhiteboardProvider = ({ children }) => {
     });
 
     const zoomIn = useCallback(() => {
-        setViewport(prev => ({ ...prev, scale: Math.min(prev.scale * 1.1, 5) }));
+        setViewport(prev => {
+            const newScale = Math.min(prev.scale * 1.1, 5);
+            const zoomFactor = newScale / prev.scale;
+            const centerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            return {
+                x: centerScreen.x - (centerScreen.x - prev.x) * zoomFactor,
+                y: centerScreen.y - (centerScreen.y - prev.y) * zoomFactor,
+                scale: newScale
+            };
+        });
     }, []);
 
     const zoomOut = useCallback(() => {
-        setViewport(prev => ({ ...prev, scale: Math.max(prev.scale / 1.1, 0.1) }));
+        setViewport(prev => {
+            const newScale = Math.max(prev.scale / 1.1, 0.1);
+            const zoomFactor = newScale / prev.scale;
+            const centerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            return {
+                x: centerScreen.x - (centerScreen.x - prev.x) * zoomFactor,
+                y: centerScreen.y - (centerScreen.y - prev.y) * zoomFactor,
+                scale: newScale
+            };
+        });
     }, []);
 
     const resetZoom = useCallback(() => {
@@ -380,6 +401,10 @@ export const WhiteboardProvider = ({ children }) => {
         updateBackground,
         showBackgroundModal,
         setShowBackgroundModal,
+        showStickyModal,
+        setShowStickyModal,
+        showFrameModal,
+        setShowFrameModal,
         settings,
         updateSettings,
         showSettingsSidebar,

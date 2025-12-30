@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Grid, Download, Trash2, Settings, FilePlus, Pen, Eraser, MousePointer, Square, Circle, Minus, ArrowRight, Type } from 'lucide-react';
+import { Search, Grid, Download, Trash2, Settings, FilePlus, Pen, Eraser, MousePointer, Square, Circle, Minus, ArrowRight, Type, StickyNote, Layout, ZoomIn, ZoomOut, Maximize, FileCode, FileText, Lock } from 'lucide-react';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
 const CommandPalette = () => {
@@ -13,7 +13,12 @@ const CommandPalette = () => {
         exportCanvasPNG,
         updateBackground,
         settings,
-        updateSettings
+        updateSettings,
+        zoomIn,
+        zoomOut,
+        resetZoom,
+        exportCanvasSVG,
+        exportCanvasPDF
     } = useWhiteboard();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +32,8 @@ const CommandPalette = () => {
         { id: 'grid_squares', label: 'Set Grid to Squares', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'squares' }); setActiveCategory('background'); } },
         { id: 'grid_none', label: 'Remove Grid', icon: <Grid size={18} />, category: 'Canvas', perform: () => { updateBackground({ gridType: 'none' }); setActiveCategory('background'); } },
         { id: 'export_png', label: 'Export as PNG', icon: <Download size={18} />, category: 'File', perform: exportCanvasPNG },
+        { id: 'export_svg', label: 'Export as SVG', icon: <FileCode size={18} />, category: 'File', perform: exportCanvasSVG },
+        { id: 'export_pdf', label: 'Export as PDF', icon: <FileText size={18} />, category: 'File', perform: exportCanvasPDF },
         { id: 'clear_canvas', label: 'Clear Canvas', icon: <Trash2 size={18} />, category: 'Danger', perform: clearCanvas },
         { id: 'new_canvas', label: 'Go to Welcome Screen', icon: <FilePlus size={18} />, category: 'Navigation', perform: () => { setShowWelcome(true); setActiveCategory(null); } },
         { id: 'open_settings', label: 'Open Settings', icon: <Settings size={18} />, category: 'Navigation', perform: () => setShowSettingsSidebar(true) },
@@ -34,14 +41,21 @@ const CommandPalette = () => {
         { id: 'tool_pen', label: 'Switch to Pen', icon: <Pen size={18} />, category: 'Tools', perform: () => { setActiveTool('pen'); setActiveCategory('draw'); } },
         { id: 'tool_eraser', label: 'Switch to Eraser', icon: <Eraser size={18} />, category: 'Tools', perform: () => { setActiveTool('eraser'); setActiveCategory('draw'); } },
         { id: 'tool_select', label: 'Switch to Selection', icon: <MousePointer size={18} />, category: 'Tools', perform: () => { setActiveTool('select'); setActiveCategory('draw'); } },
+        { id: 'tool_sticky', label: 'Add Sticky Note', icon: <StickyNote size={18} />, category: 'Tools', perform: () => { setActiveTool('sticky'); setActiveCategory('organize'); } },
+        { id: 'tool_frame', label: 'Add Frame / Artboard', icon: <Layout size={18} />, category: 'Tools', perform: () => { setActiveTool('frame'); setActiveCategory('organize'); } },
         { id: 'tool_rectangle', label: 'Draw Rectangle', icon: <Square size={18} />, category: 'Tools', perform: () => { setActiveTool('rectangle'); setActiveCategory('shapes'); } },
         { id: 'tool_circle', label: 'Draw Circle', icon: <Circle size={18} />, category: 'Tools', perform: () => { setActiveTool('circle'); setActiveCategory('shapes'); } },
         { id: 'tool_line', label: 'Draw Line', icon: <Minus size={18} />, category: 'Tools', perform: () => { setActiveTool('line'); setActiveCategory('shapes'); } },
         { id: 'tool_arrow', label: 'Draw Arrow', icon: <ArrowRight size={18} />, category: 'Tools', perform: () => { setActiveTool('arrow'); setActiveCategory('shapes'); } },
         { id: 'tool_text', label: 'Add Text', icon: <Type size={18} />, category: 'Tools', perform: () => { setShowTextModal(true); setActiveCategory('shapes'); } },
 
-        // Focus Mode
-        { id: 'focus_mode', label: 'Toggle Focus Mode', icon: <Grid size={18} />, category: 'View', perform: () => updateSettings({ focusMode: !settings?.focusMode }) },
+        // View Controls
+        { id: 'zoom_in', label: 'Zoom In', icon: <ZoomIn size={18} />, category: 'View', perform: zoomIn },
+        { id: 'zoom_out', label: 'Zoom Out', icon: <ZoomOut size={18} />, category: 'View', perform: zoomOut },
+        { id: 'zoom_reset', label: 'Reset Zoom (100%)', icon: <Maximize size={18} />, category: 'View', perform: resetZoom },
+        { id: 'focus_mode', label: 'Toggle Focus Mode', icon: <Lock size={18} />, category: 'View', perform: () => updateSettings({ focusMode: !settings?.focusMode }) },
+        { id: 'grid_snapping', label: 'Toggle Grid Snapping', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateSettings({ gridSnapping: !settings?.gridSnapping }) },
+        { id: 'show_clock', label: 'Toggle System Clock', icon: <FilePlus size={18} />, category: 'View', perform: () => updateSettings({ showClock: !settings?.showClock }) },
     ];
 
     const filteredActions = actions.filter(action =>

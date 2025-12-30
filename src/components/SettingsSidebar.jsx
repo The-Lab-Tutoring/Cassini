@@ -190,20 +190,20 @@ const SettingsSidebar = () => {
                         <div style={{ marginBottom: '32px' }}>
                             <h3 style={getSectionTitleStyle(isLight)}>Pro Utilities</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                {/* Session Timer */}
+                                {/* System Clock */}
                                 {isVisible('timer') && (
                                     <div>
-                                        <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>Session Timer</div>
+                                        <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>System Clock</div>
                                         <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
                                             <button
-                                                onClick={() => updateSettings({ showTimer: true })}
-                                                style={{ ...getToggleButtonStyle(isLight), background: settings.showTimer ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                                onClick={() => updateSettings({ showClock: true })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: settings.showClock ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
                                             >
                                                 <span>On</span>
                                             </button>
                                             <button
-                                                onClick={() => updateSettings({ showTimer: false })}
-                                                style={{ ...getToggleButtonStyle(isLight), background: !settings.showTimer ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
+                                                onClick={() => updateSettings({ showClock: false })}
+                                                style={{ ...getToggleButtonStyle(isLight), background: !settings.showClock ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
                                             >
                                                 <span>Off</span>
                                             </button>

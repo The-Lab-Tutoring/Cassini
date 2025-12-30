@@ -224,7 +224,7 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements }) => {
             className="glass"
             style={{
                 position: 'fixed',
-                bottom: '20px',
+                bottom: '80px',
                 right: '20px',
                 zIndex: 2000,
                 padding: '12px 16px',
