@@ -33,6 +33,7 @@ export const WhiteboardProvider = ({ children }) => {
 
     // Canvas elements
     const [elements, setElements] = useState([]);
+    const [ephemeralElements, setEphemeralElements] = useState([]);
     const [selectedElement, setSelectedElement] = useState(null);
 
     // Ruler and Protractor
@@ -60,6 +61,12 @@ export const WhiteboardProvider = ({ children }) => {
         focusMode: false,
         gridSnapping: false,
         showClock: true
+    });
+
+    // Creative Intelligence Settings
+    const [ciSettings, setCiSettings] = useState({
+        laserPointer: false,
+        enableOCR: false
     });
 
     // Viewport state for Infinite Canvas
@@ -121,6 +128,14 @@ export const WhiteboardProvider = ({ children }) => {
             return newElements;
         });
     }, [historyStep]);
+
+    const addEphemeralElement = useCallback((element) => {
+        setEphemeralElements(prev => [...prev, element]);
+    }, []);
+
+    const removeEphemeralElement = useCallback((id) => {
+        setEphemeralElements(prev => prev.filter(el => el.id !== id));
+    }, []);
 
     const updateElement = useCallback((id, updates) => {
         setElements(prev => prev.map(el => el.id === id ? { ...el, ...updates } : el));
@@ -290,6 +305,10 @@ export const WhiteboardProvider = ({ children }) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
     }, []);
 
+    const updateCiSettings = useCallback((newSettings) => {
+        setCiSettings(prev => ({ ...prev, ...newSettings }));
+    }, []);
+
     // Sync background color with icon theme
     useEffect(() => {
         if (settings.iconTheme === 'light' && background.backgroundColor !== '#ffffff') {
@@ -413,7 +432,12 @@ export const WhiteboardProvider = ({ children }) => {
         setShowWelcome,
         hasAutoSave,
         loadAutoSave,
-        clearAutoSave
+        clearAutoSave,
+        ciSettings,
+        updateCiSettings,
+        ephemeralElements,
+        addEphemeralElement,
+        removeEphemeralElement
     };
 
     return (

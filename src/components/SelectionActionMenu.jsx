@@ -1,6 +1,6 @@
-import { Trash2, Edit2 } from 'lucide-react';
+import { Trash2, Edit2, Type } from 'lucide-react';
 
-const SelectionActionMenu = ({ selectedElements, onDelete, onEdit, position }) => {
+const SelectionActionMenu = ({ selectedElements, onDelete, onEdit, onOCR, enableOCR, position }) => {
     if (!selectedElements || selectedElements.length === 0) return null;
 
     return (
@@ -50,6 +50,24 @@ const SelectionActionMenu = ({ selectedElements, onDelete, onEdit, position }) =
                     }}
                 >
                     <Edit2 size={18} />
+                </button>
+            )}
+            {selectedElements.some(el => el.type === 'stroke') && enableOCR && (
+                <button
+                    className="glass-button"
+                    onClick={onOCR}
+                    title="Convert to Text"
+                    style={{
+                        width: '36px',
+                        height: '36px',
+                        padding: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(52, 199, 89, 0.2)'
+                    }}
+                >
+                    <Type size={18} />
                 </button>
             )}
             <div style={{

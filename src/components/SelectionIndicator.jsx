@@ -6,7 +6,7 @@ const SelectionIndicator = ({ count }) => {
     return (
         <div className="glass" style={{
             position: 'fixed',
-            bottom: '20px',
+            bottom: '60px',
             left: '20px',
             padding: '8px 16px',
             borderRadius: 'var(--radius-lg)',

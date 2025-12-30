@@ -9,6 +9,8 @@ import FrameModal from './FrameModal';
 import ZoomControls from './ZoomControls';
 
 import { saveWhiteboard } from '../utils/fileUtils';
+import { recognizeHandwriting } from '../utils/ocrUtils';
+
 
 // Helper to get anchor points for a shape
 const getAnchors = (element) => {
@@ -71,8 +73,13 @@ const Whiteboard = () => {
         background,
         settings,
         updateSettings,
+        ciSettings,
+        updateCiSettings,
         setShowStickyModal,
-        setShowFrameModal
+        setShowFrameModal,
+        ephemeralElements,
+        addEphemeralElement,
+        removeEphemeralElement
     } = useWhiteboard();
 
     // Initialize canvas
@@ -199,7 +206,19 @@ const Whiteboard = () => {
     // Redraw canvas whenever elements change
     useEffect(() => {
         redrawCanvas();
-    }, [elements, ruler, protractor, selectedElements, selectionBox, viewport, background, currentShape]);
+    }, [elements, ephemeralElements, ruler, protractor, selectedElements, selectionBox, viewport, background, currentShape]);
+
+    // Cleanup loop for ephemeral elements
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const expired = ephemeralElements.filter(el => el.expiry < now);
+            if (expired.length > 0) {
+                expired.forEach(el => removeEphemeralElement(el.id));
+            }
+        }, 100);
+        return () => clearInterval(interval);
+    }, [ephemeralElements, removeEphemeralElement]);
 
     // Handle Zoom
     useEffect(() => {
@@ -944,6 +963,21 @@ const Whiteboard = () => {
             }
         });
 
+        // Draw ephemeral elements (laser pointer)
+        ephemeralElements.forEach(element => {
+            if (element.type === 'laser') {
+                const timeLeft = element.expiry - Date.now();
+                const opacity = Math.max(0, timeLeft / 2000); // Fade over 2 seconds
+
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.shadowBlur = 10 * opacity;
+                ctx.shadowColor = element.color || '#FF2D55';
+                drawStroke(ctx, element);
+                ctx.restore();
+            }
+        });
+
         // Draw current shape preview
         if (currentShape) {
             drawShape(ctx, currentShape);
@@ -1122,7 +1156,7 @@ const Whiteboard = () => {
             }
         }
 
-        if (activeTool === 'pen') {
+        if (activeTool === 'pen' || activeTool === 'laser') {
             setIsDrawing(true);
             // Initialize path with pressure in ref
             currentPathRef.current = [{ ...pos, pressure: e.pressure || 0.5 }];
@@ -1131,9 +1165,9 @@ const Whiteboard = () => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
             ctx.beginPath();
-            ctx.fillStyle = toolProperties.color;
+            ctx.fillStyle = activeTool === 'laser' ? '#FF2D55' : toolProperties.color;
             ctx.globalAlpha = toolProperties.opacity;
-            ctx.arc(pos.x, pos.y, toolProperties.thickness / 2, 0, Math.PI * 2);
+            ctx.arc(pos.x, pos.y, (activeTool === 'laser' ? 4 : toolProperties.thickness) / 2, 0, Math.PI * 2);
             ctx.fill();
             ctx.globalAlpha = 1;
 
@@ -1362,7 +1396,7 @@ const Whiteboard = () => {
             return;
         }
 
-        if (isDrawing && activeTool === 'pen') {
+        if (isDrawing && (activeTool === 'pen' || activeTool === 'laser')) {
             const newPoint = { ...pos, pressure: e.pressure || 0.5 };
 
             // Add to ref path
@@ -1388,15 +1422,22 @@ const Whiteboard = () => {
 
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
-                ctx.strokeStyle = toolProperties.color;
+                ctx.strokeStyle = activeTool === 'laser' ? '#FF2D55' : toolProperties.color;
                 ctx.globalAlpha = toolProperties.opacity;
 
+                if (activeTool === 'laser') {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#FF2D55';
+                }
+
                 const pressure = p2.pressure || 0.5;
-                const dynamicThickness = Math.max(1, toolProperties.thickness * pressure * 2);
+                const baseThickness = activeTool === 'laser' ? 4 : toolProperties.thickness;
+                const dynamicThickness = Math.max(1, baseThickness * pressure * 2);
                 ctx.lineWidth = dynamicThickness;
 
                 ctx.stroke();
                 ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
             }
             ctx.restore();
             return;
@@ -1529,73 +1570,94 @@ const Whiteboard = () => {
     const handlePointerUp = (e) => {
         e.target.releasePointerCapture(e.pointerId);
 
-        // Reset touch count
-        if (e.pointerType === 'touch') {
-            setTouchCount(prev => Math.max(0, prev - 1));
-        }
+        try {
+            // Reset touch count
+            if (e.pointerType === 'touch') {
+                setTouchCount(prev => Math.max(0, prev - 1));
+            }
 
-        if (isPanning) {
-            setIsPanning(false);
-            return;
-        }
+            if (isPanning) {
+                setIsPanning(false);
+                return;
+            }
 
-        // Reset resize state
-        if (isResizing) {
-            setIsResizing(false);
-            setResizeHandle(null);
-            setResizeStart(null);
-            return;
-        }
+            // Reset resize state
+            if (isResizing) {
+                setIsResizing(false);
+                setResizeHandle(null);
+                setResizeStart(null);
+                return;
+            }
 
-        if (isDrawing && activeTool === 'pen' && currentPathRef.current.length > 0) {
-            addElement({
-                id: Date.now(),
-                type: 'stroke',
-                points: [...currentPathRef.current], // Create copy from ref
-                color: toolProperties.color,
-                thickness: toolProperties.thickness,
-                opacity: toolProperties.opacity
-            });
-            currentPathRef.current = []; // Clear ref
-        }
-
-        if (isDrawing && currentShape) {
-            // Only add if it has some size
-            if (Math.abs(currentShape.width) > 5 || Math.abs(currentShape.height) > 5) {
-                const newElementId = Date.now();
-                addElement({
-                    id: newElementId,
-                    ...currentShape
-                });
-
-                if (currentShape.type === 'sticky') {
-                    setSelectedElement({ id: newElementId, ...currentShape });
-                    setShowStickyModal(true);
-                } else if (currentShape.type === 'frame') {
-                    setSelectedElement({ id: newElementId, ...currentShape });
-                    setShowFrameModal(true);
+            if (isDrawing && (activeTool === 'pen' || activeTool === 'laser') && currentPathRef.current.length > 0) {
+                try {
+                    if (activeTool === 'laser') {
+                        addEphemeralElement({
+                            id: Date.now(),
+                            type: 'laser',
+                            points: [...currentPathRef.current],
+                            color: '#FF2D55',
+                            thickness: 4,
+                            expiry: Date.now() + 2000
+                        });
+                    } else if (activeTool === 'pen') {
+                        // PEN TOOL
+                        addElement({
+                            id: Date.now(),
+                            type: 'stroke',
+                            points: [...currentPathRef.current],
+                            color: toolProperties.color,
+                            thickness: toolProperties.thickness,
+                            opacity: toolProperties.opacity
+                        });
+                    }
+                } finally {
+                    currentPathRef.current = []; // ALWAYS clear ref
                 }
             }
-            setCurrentShape(null);
-        }
 
-        if (selectionBox && activeTool === 'select') {
-            const selected = elements.filter(el => {
-                if (el.type === 'stroke') {
-                    const bounds = getStrokeBounds(el);
-                    return bounds && pointInRect(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, selectionBox);
-                } else if (el.type === 'text' || el.type === 'equation') {
-                    return pointInRect(el.x, el.y, selectionBox);
+            if (isDrawing && currentShape) {
+                // Only add if it has some size
+                if (Math.abs(currentShape.width) > 5 || Math.abs(currentShape.height) > 5) {
+                    const newElementId = Date.now();
+                    addElement({
+                        id: newElementId,
+                        ...currentShape
+                    });
+
+                    if (currentShape.type === 'sticky') {
+                        setSelectedElement({ id: newElementId, ...currentShape });
+                        setShowStickyModal(true);
+                    } else if (currentShape.type === 'frame') {
+                        setSelectedElement({ id: newElementId, ...currentShape });
+                        setShowFrameModal(true);
+                    }
                 }
-                return false;
-            });
-            setSelectedElements(selected);
-            setSelectionBox(null);
-        }
+                setCurrentShape(null);
+            }
 
-        setIsDrawing(false);
-        setIsErasing(false);
-        setDraggedElement(null);
+            if (selectionBox && activeTool === 'select') {
+                const selected = elements.filter(el => {
+                    if (el.type === 'stroke') {
+                        const bounds = getStrokeBounds(el);
+                        return bounds && pointInRect(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, selectionBox);
+                    } else if (el.type === 'text' || el.type === 'equation') {
+                        return pointInRect(el.x, el.y, selectionBox);
+                    } else if (['rectangle', 'circle', 'line', 'arrow', 'image', 'sticky', 'frame'].includes(el.type)) {
+                        return pointInRect(el.x, el.y, selectionBox) || (el.x >= selectionBox.x && el.x + el.width <= selectionBox.x + selectionBox.width && el.y >= selectionBox.y && el.y + el.height <= selectionBox.y + selectionBox.height);
+                    }
+                    return false;
+                });
+                setSelectedElements(selected);
+                setSelectionBox(null);
+            }
+        } catch (error) {
+            console.error("PointerUp Error:", error);
+        } finally {
+            setIsDrawing(false);
+            setIsErasing(false);
+            setDraggedElement(null);
+        }
     };
 
     // Action menu handlers
@@ -1613,6 +1675,46 @@ const Whiteboard = () => {
             setSelectedElement(element);
             setShowFrameModal(true);
         }
+    };
+
+    const handleOCR = async () => {
+        const strokes = selectedElements.filter(el => el.type === 'stroke');
+        if (strokes.length === 0) return;
+
+        // Calculate collective bounds
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        strokes.forEach(s => {
+            const b = getStrokeBounds(s);
+            if (b) {
+                minX = Math.min(minX, b.x);
+                minY = Math.min(minY, b.y);
+                maxX = Math.max(maxX, b.x + b.width);
+                maxY = Math.max(maxY, b.y + b.height);
+            }
+        });
+
+        const bounds = { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+
+        // Use Tesseract OCR
+        const recognizedText = await recognizeHandwriting(strokes, bounds);
+
+        // Remove old strokes
+        strokes.forEach(s => deleteElement(s.id));
+
+        // Add combined text
+        addElement({
+            id: Date.now(),
+            type: 'text',
+            text: recognizedText,
+            x: minX,
+            y: minY + bounds.height / 2,
+            color: toolProperties.color,
+            fontSize: Math.max(16, Math.min(48, bounds.height * 0.8)),
+            fontFamily: 'Inter',
+            opacity: 1
+        });
+
+        setSelectedElements([]);
     };
 
     // Calculate action menu position
@@ -1661,6 +1763,8 @@ const Whiteboard = () => {
                     selectedElements={selectedElements}
                     onDelete={handleDeleteSelected}
                     onUpdateElements={(id, updates) => updateElement(id, updates)}
+                    onOCR={handleOCR}
+                    enableOCR={ciSettings.enableOCR}
                 />
             )}
             {selectedElements.length > 0 && !isDrawing && !isResizing && (
@@ -1668,6 +1772,8 @@ const Whiteboard = () => {
                     selectedElements={selectedElements}
                     onDelete={handleDeleteSelected}
                     onEdit={handleEditElement}
+                    onOCR={handleOCR}
+                    enableOCR={ciSettings.enableOCR}
                     position={getActionMenuPosition()}
                 />
             )}

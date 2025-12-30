@@ -1,5 +1,14 @@
 # Cassini - Release Notes
 
+## [1.7.4] - 2025-12-30
+
+### Phase 4: Creative Intelligence
+
+- **Laser Pointer Tool**: Ephemeral strokes with a 2-second glow effect, perfect for presentations.
+- **Handwriting OCR (v1)**: Integrated **Tesseract.js** engine to convert handwritten strokes into editable text elements (English).
+- **Creative Intelligence Panel**: New toggleable settings section to control all CI features independently.
+- **Branded CI Experience**: Integrated "Creative Intelligence v1" branding across the settings and command palette.
+
 ## [1.7.3] - 2025-12-29
 
 ### Phase 3: The Power Media & Organization
@@ -107,7 +116,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 **Release Date:** December 21, 2024
 
-### 🚀 Improvements in 1.5.0.1
+### Improvements in 1.5.0.1
 
 - **Horizontal Color Picker** - Corrected the color palette layout to ensure it always expands horizontally, matching the "floating bar" aesthetic.
 
@@ -117,7 +126,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 **Release Date:** December 21, 2024
 
-### 🚀 Improvements in 1.5.0
+### Improvements in 1.5.0
 
 - **README Refactor** - Transformed `README.md` into a professional introductory landing page.
 - **Workflow Optimization** - Removed version history from README to consolidate it in `RELEASE_NOTES.md`, streamlining future updates.
@@ -147,7 +156,7 @@ This major update focuses on refining the individual creative workflow, removing
 
 **Release Date:** December 16, 2024
 
-### 🚀 Improvements
+### Improvements in 1.4.7.1
 
 - **Larger Layers Button** - Increased touch target size for layers panel toggle
 

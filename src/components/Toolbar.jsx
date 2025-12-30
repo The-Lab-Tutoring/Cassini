@@ -32,7 +32,8 @@ import {
     Image as ImageIcon,
     Box,
     StickyNote,
-    Layout
+    Layout,
+    Sparkles
 } from 'lucide-react';
 import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
@@ -63,7 +64,8 @@ const Toolbar = () => {
         setShowStickyModal,
         setShowFrameModal,
         settings,
-        updateSettings
+        updateSettings,
+        ciSettings
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -92,6 +94,7 @@ const Toolbar = () => {
         { id: 'pen', icon: Pen, label: 'Pen' },
         { id: 'eraser', icon: Eraser, label: 'Eraser' },
         { id: 'select', icon: MousePointer, label: 'Select' },
+        { id: 'laser', icon: Sparkles, label: 'Laser Pointer', hidden: !ciSettings.laserPointer },
     ];
 
     const shapeTools = [
@@ -137,7 +140,7 @@ const Toolbar = () => {
                     width: size,
                     height: size,
                     padding: size * 0.2,
-                    display: 'flex',
+                    display: tool.hidden ? 'none' : 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}

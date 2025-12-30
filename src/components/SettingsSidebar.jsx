@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Sun, Moon, Grid, Layout, Square, Type, Keyboard } from 'lucide-react';
+import { X, User, Sun, Moon, Grid, Layout, Square, Type, Keyboard, Circle } from 'lucide-react';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
 const SettingsSidebar = () => {
@@ -9,7 +9,9 @@ const SettingsSidebar = () => {
         settings,
         updateSettings,
         background,
-        updateBackground
+        updateBackground,
+        ciSettings,
+        updateCiSettings
     } = useWhiteboard();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +25,7 @@ const SettingsSidebar = () => {
         { id: 'smoothing', label: 'Stroke Smoothing', tags: ['bezier', 'lines', 'drawing'] },
         { id: 'grid', label: 'Grid Type', tags: ['background', 'dots', 'lines', 'canvas'] },
         { id: 'density', label: 'Grid Density', tags: ['size', 'spacing'] },
+        { id: 'creative', label: 'Creative Intelligence (v1)', tags: ['ai', 'beautify', 'ocr', 'laser', 'magic'] },
         { id: 'shortcuts', label: 'Keyboard Shortcuts', tags: ['keys', 'hotkeys', 'help'] }
     ];
 
@@ -241,7 +244,7 @@ const SettingsSidebar = () => {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                                 {[
                                     { id: 'none', label: 'None', icon: <Square size={16} /> },
-                                    { id: 'dots', label: 'Dots', icon: <Type size={16} /> },
+                                    { id: 'dots', label: 'Dots', icon: <Circle size={16} /> },
                                     { id: 'lines', label: 'Lines', icon: <Layout size={16} /> },
                                     { id: 'squares', label: 'Squares', icon: <Grid size={16} /> }
                                 ].map(grid => (
@@ -286,6 +289,30 @@ const SettingsSidebar = () => {
                         </div>
                     )}
 
+                    {/* Creative Intelligence */}
+                    {isVisible('creative') && (
+                        <div style={{ padding: '0 8px', marginBottom: '32px' }}>
+                            <h3 style={getSectionTitleStyle(isLight)}>Creative Intelligence</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                                <ToggleItem
+                                    label="Laser Pointer"
+                                    description="Temporary strokes that highlight content and disappear after 2s."
+                                    active={ciSettings.laserPointer}
+                                    onToggle={() => updateCiSettings({ laserPointer: !ciSettings.laserPointer })}
+                                    isLight={isLight}
+                                />
+                                <ToggleItem
+                                    label="Experimental OCR"
+                                    description="Enable text recognition for handwritten strokes."
+                                    active={ciSettings.enableOCR}
+                                    onToggle={() => updateCiSettings({ enableOCR: !ciSettings.enableOCR })}
+                                    isLight={isLight}
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     {/* Keyboard Shortcuts */}
                     {isVisible('shortcuts') && (
                         <div style={{ marginBottom: '32px' }}>
@@ -316,7 +343,7 @@ const SettingsSidebar = () => {
                 </div>
 
                 {/* Footer */}
-                <div style={{ borderTop: isLight ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ borderTop: isLight ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                     <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         <img
                             src="/logo.png"
@@ -328,7 +355,10 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.7.3</span>
+                        <span>Cassini v1.7.4</span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Creative Intelligence v1
                     </div>
                 </div>
 
@@ -355,6 +385,43 @@ const ShortcutItem = ({ label, keys, isLight }) => (
                 }}>{key}</kbd>
             ))}
         </div>
+    </div>
+);
+
+const ToggleItem = ({ label, description, active, onToggle, isLight }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+        <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: isLight ? '#000000' : 'white', marginBottom: '2px' }}>{label}</div>
+            <div style={{ fontSize: '11px', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.4)', lineHeight: '1.4' }}>{description}</div>
+        </div>
+        <button
+            onClick={onToggle}
+            style={{
+                width: '36px',
+                height: '20px',
+                borderRadius: '20px',
+                background: active ? '#34C759' : (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'),
+                border: 'none',
+                position: 'relative',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
+                marginTop: '4px'
+            }}
+        >
+            <div style={{
+                width: '16px',
+                height: '16px',
+                borderRadius: '50%',
+                background: 'white',
+                position: 'absolute',
+                top: '2px',
+                left: active ? '18px' : '2px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }} />
+        </button>
     </div>
 );
 

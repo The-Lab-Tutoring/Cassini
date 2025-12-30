@@ -9,6 +9,7 @@
 ### 🎨 Creative Workspace
 
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
+- **Creative Intelligence (v1.7.4)** - Intelligent drawing with Laser Pointer (ephemeral strokes) and Tesseract-powered OCR (handwriting to text).
 - **Sticky Notes & Frames** - Organize your thoughts with vibrant stickies and containerize project sections with named artboards.
 - **Stacked Navigation** - New bottom-anchored toolbar with contextual secondary bars for a cleaner, modern workflow.
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
@@ -66,4 +67,4 @@ For a detailed list of changes and version history, please see:
 
 ---
 
-**Built with ❤️ by Orama Technologies**
+Built with ❤️ by **Orama Technologies**

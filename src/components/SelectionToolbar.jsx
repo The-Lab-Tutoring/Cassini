@@ -11,11 +11,12 @@ import {
     ArrowDownToLine,
     Layers,
     GripHorizontal,
-    GripVertical
+    GripVertical,
+    Type
 } from 'lucide-react';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
-const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements }) => {
+const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR, enableOCR }) => {
     const { elements, setElements } = useWhiteboard();
 
     if (!selectedElements || selectedElements.length === 0) return null;
@@ -310,6 +311,35 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements }) => {
                     </ToolButton>
                 </div>
             </div>
+
+            {/* Actions Section */}
+            {selectedElements.some(el => el.type === 'stroke') && enableOCR && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase' }}>
+                        Intelligence
+                    </div>
+                    <button
+                        className="glass-button"
+                        onClick={onOCR}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            background: 'rgba(52, 199, 89, 0.2)',
+                            color: '#34C759',
+                            fontWeight: 500,
+                            fontSize: '13px',
+                            marginBottom: '8px'
+                        }}
+                    >
+                        <Type size={16} />
+                        Convert to Text
+                    </button>
+                </div>
+            )}
 
             {/* Delete Button */}
             <button

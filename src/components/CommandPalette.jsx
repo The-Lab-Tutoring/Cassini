@@ -18,7 +18,9 @@ const CommandPalette = () => {
         zoomOut,
         resetZoom,
         exportCanvasSVG,
-        exportCanvasPDF
+        exportCanvasPDF,
+        ciSettings,
+        updateCiSettings
     } = useWhiteboard();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +58,11 @@ const CommandPalette = () => {
         { id: 'focus_mode', label: 'Toggle Focus Mode', icon: <Lock size={18} />, category: 'View', perform: () => updateSettings({ focusMode: !settings?.focusMode }) },
         { id: 'grid_snapping', label: 'Toggle Grid Snapping', icon: <Grid size={18} />, category: 'Canvas', perform: () => updateSettings({ gridSnapping: !settings?.gridSnapping }) },
         { id: 'show_clock', label: 'Toggle System Clock', icon: <FilePlus size={18} />, category: 'View', perform: () => updateSettings({ showClock: !settings?.showClock }) },
+
+        // Creative Intelligence Toggles
+
+        { id: 'toggle_laser', label: 'Toggle Laser Pointer', icon: <Pen size={18} />, category: 'Creative Intelligence', perform: () => updateCiSettings({ laserPointer: !ciSettings.laserPointer }) },
+        { id: 'toggle_ocr', label: 'Toggle Experimental OCR', icon: <Type size={18} />, category: 'Creative Intelligence', perform: () => updateCiSettings({ enableOCR: !ciSettings.enableOCR }) },
     ];
 
     const filteredActions = actions.filter(action =>
