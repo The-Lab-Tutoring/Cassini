@@ -1,5 +1,15 @@
 # Cassini - Release Notes
 
+## [1.6.0-b] - 2025-12-29
+
+### Light Mode Refinements
+
+- **Automatic Background Sync**: Canvas background now automatically switches to white when Light Mode is selected, and back to dark when Liquid Glass is selected.
+- **Improved Settings Sidebar**: Sidebar UI now fully adapts to Light Mode with high-contrast text, borders, and a translucent white background.
+- **Bug Fix**: Resolved a crash when opening settings due to missing style references.
+
+---
+
 ## [1.6.0] - 2025-12-26
 
 ### The Solo Experience Update
@@ -16,6 +26,7 @@ This major update focuses on refining the individual creative workflow, removing
 ### Removed
 
 - **Layers System**: Removed the layers panel to simplify the interface and focus on speed and direct manipulation.
+
 ---
 
 ## [1.5.3] - 2025-12-22

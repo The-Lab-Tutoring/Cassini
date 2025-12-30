@@ -12,6 +12,8 @@ const SettingsSidebar = () => {
         updateBackground
     } = useWhiteboard();
 
+    const isLight = settings.iconTheme === 'light';
+
     if (!showSettingsSidebar) return null;
 
     const grids = [
@@ -35,25 +37,25 @@ const SettingsSidebar = () => {
             justifyContent: 'flex-end',
             transition: 'all 0.3s ease'
         }} onClick={() => setShowSettingsSidebar(false)}>
-            <div className="settings-sidebar" style={{
+            <div className={`settings-sidebar ${isLight ? 'light-mode' : ''}`} style={{
                 width: '320px',
                 height: '100%',
-                background: 'rgba(20, 20, 20, 0.85)',
+                background: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.85)',
                 backdropFilter: 'blur(20px)',
-                borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+                borderLeft: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '24px',
-                color: 'white',
+                color: isLight ? '#1a1a1a' : 'white',
                 fontFamily: 'Inter, sans-serif'
             }} onClick={e => e.stopPropagation()}>
 
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                    <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>Settings</h2>
+                    <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0, color: isLight ? '#000000' : 'white' }}>Settings</h2>
                     <button
                         onClick={() => setShowSettingsSidebar(false)}
-                        style={{ background: 'none', border: 'none', color: 'rgba(255, 255, 255, 0.5)', cursor: 'pointer', padding: '4px' }}
+                        style={{ background: 'none', border: 'none', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)', cursor: 'pointer', padding: '4px' }}
                     >
                         <X size={24} />
                     </button>
@@ -61,7 +63,7 @@ const SettingsSidebar = () => {
 
                 {/* User Profile */}
                 <div style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
+                    background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)',
                     borderRadius: '16px',
                     padding: '20px',
                     marginBottom: '24px',
@@ -82,7 +84,7 @@ const SettingsSidebar = () => {
                         <User size={24} />
                     </div>
                     <div>
-                        <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.4)', marginBottom: '2px' }}>Signed in as</div>
+                        <div style={{ fontSize: '13px', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.4)', marginBottom: '2px' }}>Signed in as</div>
                         <input
                             type="text"
                             value={settings.userName}
@@ -90,7 +92,7 @@ const SettingsSidebar = () => {
                             style={{
                                 background: 'none',
                                 border: 'none',
-                                color: 'white',
+                                color: isLight ? '#000000' : 'white',
                                 fontSize: '16px',
                                 fontWeight: 500,
                                 padding: '2px 0',
@@ -106,18 +108,18 @@ const SettingsSidebar = () => {
 
                     {/* Icon Theme */}
                     <div style={{ marginBottom: '32px' }}>
-                        <h3 style={sectionTitleStyle}>Icon Theme</h3>
+                        <h3 style={getSectionTitleStyle(isLight)}>Icon Theme</h3>
                         <div style={{ display: 'flex', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
                             <button
                                 onClick={() => updateSettings({ iconTheme: 'liquid' })}
-                                style={{ ...toggleButtonStyle, background: settings.iconTheme === 'liquid' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'liquid' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
                             >
                                 <Moon size={16} />
                                 <span>Liquid Glass</span>
                             </button>
                             <button
                                 onClick={() => updateSettings({ iconTheme: 'light' })}
-                                style={{ ...toggleButtonStyle, background: settings.iconTheme === 'light' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                style={{ ...getToggleButtonStyle(isLight), background: settings.iconTheme === 'light' ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
                             >
                                 <Sun size={16} />
                                 <span>Light Mode</span>
@@ -127,37 +129,37 @@ const SettingsSidebar = () => {
 
                     {/* Stroke Smoothing */}
                     <div style={{ marginBottom: '32px' }}>
-                        <h3 style={sectionTitleStyle}>Stroke Smoothing</h3>
-                        <div style={{ display: 'flex', gap: '8px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
+                        <h3 style={getSectionTitleStyle(isLight)}>Stroke Smoothing</h3>
+                        <div style={{ display: 'flex', gap: '8px', background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '12px' }}>
                             <button
                                 onClick={() => updateSettings({ strokeSmoothing: true })}
-                                style={{ ...toggleButtonStyle, background: settings.strokeSmoothing ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                style={{ ...getToggleButtonStyle(isLight), background: settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
                             >
                                 <span>On</span>
                             </button>
                             <button
                                 onClick={() => updateSettings({ strokeSmoothing: false })}
-                                style={{ ...toggleButtonStyle, background: !settings.strokeSmoothing ? 'rgba(255, 255, 255, 0.1)' : 'transparent' }}
+                                style={{ ...getToggleButtonStyle(isLight), background: !settings.strokeSmoothing ? (isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)') : 'transparent' }}
                             >
                                 <span>Off</span>
                             </button>
                         </div>
-                        <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '8px' }}>
+                        <p style={{ fontSize: '11px', color: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.4)', marginTop: '8px' }}>
                             Smoother lines using Bezier curve interpolation
                         </p>
                     </div>
 
                     {/* Grid Type */}
                     <div style={{ marginBottom: '32px' }}>
-                        <h3 style={sectionTitleStyle}>Grid Type</h3>
+                        <h3 style={getSectionTitleStyle(isLight)}>Grid Type</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                             {grids.map(grid => (
                                 <button
                                     key={grid.id}
                                     onClick={() => updateBackground({ gridType: grid.id })}
                                     style={{
-                                        ...gridButtonStyle,
-                                        background: background.gridType === grid.id ? 'rgba(0, 122, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                                        ...getGridButtonStyle(isLight),
+                                        background: background.gridType === grid.id ? 'rgba(0, 122, 255, 0.2)' : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'),
                                         border: background.gridType === grid.id ? '1px solid #007AFF' : '1px solid transparent'
                                     }}
                                 >
@@ -170,7 +172,7 @@ const SettingsSidebar = () => {
 
                     {/* Grid Opacity */}
                     <div style={{ marginBottom: '32px' }}>
-                        <h3 style={sectionTitleStyle}>Grid Density</h3>
+                        <h3 style={getSectionTitleStyle(isLight)}>Grid Density</h3>
                         <input
                             type="range"
                             min="20"
@@ -193,33 +195,33 @@ const SettingsSidebar = () => {
                     {/* Keyboard Shortcuts */}
                     <div style={{ marginBottom: '32px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                            <Keyboard size={16} color="rgba(255, 255, 255, 0.4)" />
-                            <h3 style={{ ...sectionTitleStyle, marginBottom: 0 }}>Keyboard Shortcuts</h3>
+                            <Keyboard size={16} color={isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'} />
+                            <h3 style={{ ...getSectionTitleStyle(isLight), marginBottom: 0 }}>Keyboard Shortcuts</h3>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ShortcutItem label="Command Palette" keys={['Cmd', 'K']} />
-                            <ShortcutItem label="Save Canvas" keys={['Ctrl', 'S']} />
-                            <ShortcutItem label="Open File" keys={['Ctrl', 'O']} />
-                            <ShortcutItem label="Export PNG" keys={['Ctrl', 'E']} />
+                            <ShortcutItem label="Command Palette" keys={['Cmd', 'K']} isLight={isLight} />
+                            <ShortcutItem label="Save Canvas" keys={['Ctrl', 'S']} isLight={isLight} />
+                            <ShortcutItem label="Open File" keys={['Ctrl', 'O']} isLight={isLight} />
+                            <ShortcutItem label="Export PNG" keys={['Ctrl', 'E']} isLight={isLight} />
                             <div style={{ height: '8px' }} />
-                            <ShortcutItem label="Pen Tool" keys={['P']} />
-                            <ShortcutItem label="Eraser Tool" keys={['E']} />
-                            <ShortcutItem label="Select Tool" keys={['V']} />
-                            <ShortcutItem label="Rectangle Tool" keys={['R']} />
-                            <ShortcutItem label="Circle Tool" keys={['C']} />
-                            <ShortcutItem label="Line Tool" keys={['L']} />
-                            <ShortcutItem label="Arrow Tool" keys={['A']} />
+                            <ShortcutItem label="Pen Tool" keys={['P']} isLight={isLight} />
+                            <ShortcutItem label="Eraser Tool" keys={['E']} isLight={isLight} />
+                            <ShortcutItem label="Select Tool" keys={['V']} isLight={isLight} />
+                            <ShortcutItem label="Rectangle Tool" keys={['R']} isLight={isLight} />
+                            <ShortcutItem label="Circle Tool" keys={['C']} isLight={isLight} />
+                            <ShortcutItem label="Line Tool" keys={['L']} isLight={isLight} />
+                            <ShortcutItem label="Arrow Tool" keys={['A']} isLight={isLight} />
                             <div style={{ height: '8px' }} />
-                            <ShortcutItem label="Undo" keys={['Ctrl', 'Z']} />
-                            <ShortcutItem label="Redo" keys={['Ctrl', 'Y']} />
+                            <ShortcutItem label="Undo" keys={['Ctrl', 'Z']} isLight={isLight} />
+                            <ShortcutItem label="Redo" keys={['Ctrl', 'Y']} isLight={isLight} />
                         </div>
                     </div>
 
                 </div>
 
                 {/* Footer */}
-                <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.3)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div style={{ borderTop: isLight ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ fontSize: '12px', color: isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         <img
                             src="/logo.png"
                             alt="Cassini"
@@ -227,10 +229,10 @@ const SettingsSidebar = () => {
                                 height: '14px',
                                 width: 'auto',
                                 opacity: 0.5,
-                                filter: settings.iconTheme === 'light' ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
+                                filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.6.0</span>
+                        <span>Cassini v1.6.0-b</span>
                     </div>
                 </div>
 
@@ -239,19 +241,19 @@ const SettingsSidebar = () => {
     );
 };
 
-const ShortcutItem = ({ label, keys }) => (
+const ShortcutItem = ({ label, keys, isLight }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>{label}</span>
+        <span style={{ fontSize: '13px', color: isLight ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.7)' }}>{label}</span>
         <div style={{ display: 'flex', gap: '4px' }}>
             {keys.map((key, i) => (
                 <kbd key={i} style={{
                     padding: '2px 6px',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.1)',
                     borderRadius: '4px',
                     fontSize: '10px',
                     fontWeight: 600,
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: isLight ? '#000000' : 'rgba(255, 255, 255, 0.9)',
+                    border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(255, 255, 255, 0.1)',
                     minWidth: '20px',
                     textAlign: 'center'
                 }}>{key}</kbd>
@@ -260,16 +262,16 @@ const ShortcutItem = ({ label, keys }) => (
     </div>
 );
 
-const sectionTitleStyle = {
+const getSectionTitleStyle = (isLight) => ({
     fontSize: '13px',
     fontWeight: 600,
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)',
     textTransform: 'uppercase',
     letterSpacing: '1px',
     marginBottom: '12px'
-};
+});
 
-const toggleButtonStyle = {
+const getToggleButtonStyle = (isLight) => ({
     flex: 1,
     display: 'flex',
     alignItems: 'center',
@@ -278,26 +280,26 @@ const toggleButtonStyle = {
     padding: '10px',
     border: 'none',
     borderRadius: '10px',
-    color: 'white',
+    color: isLight ? '#000000' : 'white',
     fontSize: '13px',
     fontWeight: 500,
     cursor: 'pointer',
     transition: 'all 0.2s ease'
-};
+});
 
-const gridButtonStyle = {
+const getGridButtonStyle = (isLight) => ({
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
     padding: '12px',
     border: 'none',
     borderRadius: '12px',
-    color: 'white',
+    color: isLight ? '#000000' : 'white',
     fontSize: '13px',
     fontWeight: 500,
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     textAlign: 'left'
-};
+});
 
 export default SettingsSidebar;

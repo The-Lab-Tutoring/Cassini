@@ -11,7 +11,7 @@
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
 - **Precision Drawing** - Pressure-sensitive pen tool, shape primitives (Rectangles, Circles, Arrows), and formatted text.
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
-- **Glassmorphism UI** - Modern, responsive interface that adapts to your workflow.
+- **Dynamic Themes** - Apple-inspired "Liquid Glass" and "High-Contrast Light Mode" with automatic canvas background syncing.
 
 ### 🛠️ Productivity & Flow
 

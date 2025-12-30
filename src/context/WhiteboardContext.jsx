@@ -250,6 +250,15 @@ export const WhiteboardProvider = ({ children }) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
     }, []);
 
+    // Sync background color with icon theme
+    useEffect(() => {
+        if (settings.iconTheme === 'light' && background.backgroundColor !== '#ffffff') {
+            updateBackground({ backgroundColor: '#ffffff', gridColor: 'rgba(0, 0, 0, 0.1)' });
+        } else if (settings.iconTheme === 'liquid' && background.backgroundColor !== '#1a1a1a') {
+            updateBackground({ backgroundColor: '#1a1a1a', gridColor: 'rgba(200, 200, 200, 0.3)' });
+        }
+    }, [settings.iconTheme, updateBackground, background.backgroundColor]);
+
     // Auto-save logic
     const autoSaveRef = useRef(null);
 
