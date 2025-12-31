@@ -78,6 +78,6 @@ Any questions, inquiries regarding this license, or requests for **Commercial Au
 
 **Orama, Cassini, Caden D. Erwin, Jayden R. McCarthy**
 
-Contact via the official GitHub repository or the designated contact method provided on the project's main website.
+Contact via the official GitHub repository or the designated contact method provided on [Orama's Website](https://oramaatbhs.my.canva.site/).
 
 *Date of Last Revision: December 31, 2025*
