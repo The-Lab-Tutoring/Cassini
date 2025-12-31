@@ -39,8 +39,6 @@
 git clone https://github.com/Orama-Tech-Tutoring/Cassini.git 
 cd Cassini
 
-Or, using SSH:
-
 # Install dependencies
 npm install
 ```
