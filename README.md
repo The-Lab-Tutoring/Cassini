@@ -36,8 +36,10 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/the-lab-tutoring/prime-cassini.git
-cd prime-cassini
+git clone https://github.com/Orama-Tech-Tutoring/Cassini.git 
+cd Cassini
+
+Or, using SSH:
 
 # Install dependencies
 npm install
