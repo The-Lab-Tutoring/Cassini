@@ -76,6 +76,8 @@ IN NO EVENT SHALL THE LICENSOR, AUTHORS, OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
 
 Any questions, inquiries regarding this license, or requests for **Commercial Authorization** must be sent to:
 
-**Orama // Cassini // Caden D. Erwin // Jayden R. McCarthy**
+**Orama, Cassini, Caden D. Erwin, Jayden R. McCarthy**
+
 Contact via the official GitHub repository or the designated contact method provided on the project's main website.
+
 *Date of Last Revision: December 31, 2025*
