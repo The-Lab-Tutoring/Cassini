@@ -9,7 +9,6 @@
 - **Changed**: Made the Settings Toolbar, Zoom Controls, System Clock, and Creative Intelligence pill have more glassmorphism.
 
 ---
- Cassini - Release Notes
 
 ## v1.7.4.1 (2025-12-30)
 
