@@ -9,19 +9,23 @@
 ### 🎨 Creative Workspace
 
 - **Infinite Canvas** - Unlimited space to brainstorm, sketch, and diagram.
-- **Creative Intelligence (v1.7.4.1)** - Intelligent drawing with Laser Pointer (ephemeral strokes) and Tesseract-powered OCR (handwriting to text).
+- **Creative Intelligence (Y26P1)** - Intelligent drawing with Laser Pointer and Tesseract-powered OCR.
+- **Save for Later (Y26P1)** - Create a personal library of reusable element groups for instant use across sessions.
+- **Smart Connectors (Y26P1)** - Intelligent lines that snap to shapes and maintain connections while moving.
+- **40/60 Onboarding (Y26P1)** - A completely redesigned, split-screen welcome experience.
 - **Sticky Notes & Frames** - Organize your thoughts with vibrant stickies and containerize project sections with named artboards.
 - **Stacked Navigation** - New bottom-anchored toolbar with contextual secondary bars for a cleaner, modern workflow.
 - **Auto-Save & Focus** - Local auto-save protection and a dedicated Focus Mode for distraction-free work.
 - **Dynamic Themes** - Apple-inspired "Liquid Glass" and "High-Contrast Light Mode" with automatic canvas background syncing.
 
-- **Professional Export** - High-quality PNG, SVG (Vector), and PDF export options.
+- **Professional Export (Y26P1)** - High-quality PNG (up to 4K), SVG, PDF, and JSON export options with unified modal control.
 - **System Clock** - Persistent floating clock to monitor local time while in the flow.
 - **Precision Zoom** - Bottom-right controls with anchored centered zoom behavior.
 - **Enhanced Image Engine** - Synchronous image caching and rotation-aware hit detection for smooth manipulation.
+- **Alignment Tools (Y26P1)** - Professional constraints to align and distribute selected elements.
 - **Grid Snapping** - Precise element alignment with toggleable grid/ruler snapping.
 - **Text-Rich UI** - Streamlined file management with clear text-based labels in the toolbar.
-- **Keyboard Mastery** - Extensive shortcuts for power users (P for Pen, Cmd+K for Palette, etc.).
+- **Keyboard Mastery** - Extensive shortcuts for power users (Alt+Arrow align, Shift+E export, etc.).
 
 ---
 

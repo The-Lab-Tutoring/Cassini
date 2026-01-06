@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FilePlus, FolderOpen, Clock, ChevronRight, User, Layout, Grid, AlignJustify, GitBranch, Lightbulb, RotateCcw } from 'lucide-react';
+import { FilePlus, FolderOpen, Clock, ChevronRight, User, RotateCcw } from 'lucide-react';
 import { loadWhiteboard, getRecentFiles } from '../utils/fileUtils';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
-// Template definitions
-const TEMPLATES = [
-    { id: 'blank', name: 'Blank Canvas', icon: FilePlus, background: { gridType: 'none', gridSize: 40, gridColor: 'rgba(200, 200, 200, 0.3)', backgroundColor: '#1a1a1a' } },
-    { id: 'lined', name: 'Lined Paper', icon: AlignJustify, background: { gridType: 'lines', gridSize: 30, gridColor: 'rgba(100, 149, 237, 0.3)', backgroundColor: '#f5f5dc' } },
-    { id: 'graph', name: 'Graph Paper', icon: Grid, background: { gridType: 'squares', gridSize: 25, gridColor: 'rgba(0, 122, 255, 0.2)', backgroundColor: '#ffffff' } },
-    { id: 'dots', name: 'Dot Grid', icon: Layout, background: { gridType: 'dots', gridSize: 30, gridColor: 'rgba(150, 150, 150, 0.5)', backgroundColor: '#fafafa' } },
-    { id: 'dark', name: 'Dark Mode', icon: Lightbulb, background: { gridType: 'dots', gridSize: 40, gridColor: 'rgba(255, 255, 255, 0.1)', backgroundColor: '#0a0a0a' } },
-];
-
 const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
-    const { settings, updateSettings, updateBackground, hasAutoSave, loadAutoSave, clearAutoSave } = useWhiteboard();
+    const { settings, updateSettings, hasAutoSave, loadAutoSave, clearAutoSave } = useWhiteboard();
     const [recentFiles, setRecentFiles] = useState([]);
     const [isExiting, setIsExiting] = useState(false);
-    const [tempName, setTempName] = useState(settings.userName || '');
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState('new');
     const [hasRecovery, setHasRecovery] = useState(false);
 
     useEffect(() => {
@@ -27,36 +16,15 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
     }, [hasAutoSave]);
 
     const handleNewCanvas = () => {
-        if (!tempName.trim()) {
-            setError('Please enter your name to continue');
-            return;
-        }
-        updateSettings({ userName: tempName.trim() });
-        clearAutoSave(); // Clear auto-save when starting fresh
+        clearAutoSave();
         setIsExiting(true);
-        setTimeout(onNewCanvas, 300);
+        setTimeout(onNewCanvas, 500);
     };
 
     const handleRecoverSession = () => {
-        if (!tempName.trim()) {
-            setError('Please enter your name to continue');
-            return;
-        }
-        updateSettings({ userName: tempName.trim() });
         loadAutoSave();
         setIsExiting(true);
-        setTimeout(onNewCanvas, 300);
-    };
-
-    const handleTemplateSelect = (template) => {
-        if (!tempName.trim()) {
-            setError('Please enter your name to continue');
-            return;
-        }
-        updateSettings({ userName: tempName.trim() });
-        updateBackground(template.background);
-        setIsExiting(true);
-        setTimeout(onNewCanvas, 300);
+        setTimeout(onNewCanvas, 500);
     };
 
     const handleOpenFile = async (e) => {
@@ -65,7 +33,7 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
             try {
                 const data = await loadWhiteboard(file);
                 setIsExiting(true);
-                setTimeout(() => onLoadFile(data, file.name), 300);
+                setTimeout(() => onLoadFile(data, file.name), 500);
             } catch (error) {
                 alert(error.message);
             }
@@ -73,21 +41,6 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
     };
 
     const handleOpenRecent = (fileMeta) => {
-        // In a real app with file system access API, we could re-open the handle.
-        // For now, browser security prevents directly reading path. 
-        // We'll just start a new canvas with that name as a placeholder or 
-        // prompt the user that they need to open the file manually.
-        // Or better: clicking 'Recent' could just show a "Open this file?" dialog 
-        // if we had the blob stored (but localStorage limit is small).
-
-        // Since we can't reliably load the actual file content from just a path string in browser,
-        // we'll treat 'Recent' mostly as a history log or quick name lookup for now,
-        // unless we implementing IndexedDB storage for full file content.
-        // For minimalism, let's just trigger the open dialog but maybe we can't pre-select.
-
-        // Refined approach: Just trigger the file picker for 'Open File' generally,
-        // but maybe 'Recent' is just a visual reminder of what you worked on.
-        // Let's implement it as a "Quick Open" button that triggers the file input.
         document.getElementById('welcome-file-input').click();
     };
 
@@ -100,147 +53,61 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
                 left: 0,
                 width: '100vw',
                 height: '100vh',
-                background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+                background: '#0a0a0a',
                 zIndex: 9999,
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 color: 'white',
                 fontFamily: 'Inter, sans-serif',
-                transition: 'opacity 0.3s ease'
+                overflow: 'hidden'
             }}
         >
-            <div className="glass-panel" style={{
-                width: '100%',
-                maxWidth: '800px',
-                height: '500px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(20px)',
+            {/* Left Panel - Actions (40%) */}
+            <div style={{
+                width: '40%',
+                height: '100%',
+                background: '#0a0a0a',
+                boxSizing: 'border-box',
+                padding: '64px',
                 display: 'flex',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                flexDirection: 'column',
+                justifyContent: 'center',
+                borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                position: 'relative',
+                zIndex: 2
             }}>
-                {/* Left Side: Branding & Actions */}
-                <div style={{
-                    flex: 1,
-                    padding: '48px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    borderRight: '1px solid rgba(255, 255, 255, 0.05)'
-                }}>
-                    <div style={{ marginBottom: '40px' }}>
-                        <img
-                            src="/logo.png"
-                            alt="Cassini Logo"
-                            style={{
-                                height: '48px',
-                                marginBottom: '16px',
-                                filter: 'brightness(0) invert(1) drop-shadow(0 0 10px rgba(255,255,255,0.3))'
-                            }}
-                        />
+                <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
+
+                    {/* Header */}
+                    <div style={{ marginBottom: '48px' }}>
                         <h1 style={{
-                            fontSize: '32px',
+                            fontSize: '64px',
                             fontWeight: 700,
-                            letterSpacing: '-0.5px',
-                            marginBottom: '8px',
-                            background: 'linear-gradient(to right, #fff, #aaa)',
+                            letterSpacing: '-1px',
+                            marginBottom: '16px',
+                            background: 'linear-gradient(to right, #fff, #888)',
                             WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
+                            WebkitTextFillColor: 'transparent',
+                            margin: '0 0 16px 0'
                         }}>
                             Cassini
                         </h1>
-                        <p style={{
-                            color: 'rgba(255, 255, 255, 0.5)',
-                            fontSize: '14px',
-                            letterSpacing: '2px',
-                            textTransform: 'uppercase'
-                        }}>
-                            by Orama
+                        <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '16px', lineHeight: '1.5', margin: 0 }}>
+                            Advanced whiteboard for creative flow.
                         </p>
                     </div>
 
-                    <div style={{ marginBottom: '32px' }}>
-                        <div style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            borderRadius: '16px',
-                            padding: '20px',
-                            border: error ? '1px solid rgba(255, 69, 58, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '16px',
-                            transition: 'all 0.3s ease'
-                        }}>
-                            <div style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #007AFF 0%, #00C6FF 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'white'
-                            }}>
-                                <User size={20} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Name</div>
-                                <input
-                                    type="text"
-                                    placeholder="Who are you?"
-                                    value={tempName}
-                                    onChange={(e) => {
-                                        setTempName(e.target.value);
-                                        if (e.target.value.trim()) setError('');
-                                    }}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: 'white',
-                                        fontSize: '16px',
-                                        fontWeight: 500,
-                                        padding: '2px 0',
-                                        width: '100%',
-                                        outline: 'none'
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        {error && (
-                            <div style={{ color: '#FF453A', fontSize: '12px', marginTop: '8px', paddingLeft: '4px' }}>
-                                {error}
-                            </div>
-                        )}
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Primary Actions */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '48px' }}>
                         <button
-                            className="welcome-btn"
+                            className="grok-btn primary"
                             onClick={handleNewCanvas}
-                            style={buttonStyle}
                         >
-                            <FilePlus size={20} />
-                            <span>New Canvas</span>
-                            <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <FilePlus size={20} />
+                                New Canvas
+                            </span>
+                            <ChevronRight size={16} style={{ opacity: 0.5 }} />
                         </button>
-
-                        {hasRecovery && (
-                            <button
-                                className="welcome-btn"
-                                onClick={handleRecoverSession}
-                                style={{
-                                    ...buttonStyle,
-                                    background: 'rgba(255, 149, 0, 0.1)',
-                                    border: '1px solid rgba(255, 149, 0, 0.3)'
-                                }}
-                            >
-                                <RotateCcw size={20} style={{ color: '#FF9500' }} />
-                                <span style={{ color: '#FF9500' }}>Recover Last Session</span>
-                                <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5, color: '#FF9500' }} />
-                            </button>
-                        )}
 
                         <div style={{ position: 'relative' }}>
                             <input
@@ -251,113 +118,176 @@ const WelcomeScreen = ({ onNewCanvas, onLoadFile }) => {
                                 style={{ display: 'none' }}
                             />
                             <button
-                                className="welcome-btn"
+                                className="grok-btn secondary"
                                 onClick={() => document.getElementById('welcome-file-input').click()}
-                                style={buttonStyle}
                             >
-                                <FolderOpen size={20} />
-                                <span>Open File</span>
-                                <ChevronRight size={16} style={{ marginLeft: 'auto', opacity: 0.5 }} />
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <FolderOpen size={20} />
+                                    Open File
+                                </span>
+                                <ChevronRight size={16} style={{ opacity: 0.5 }} />
                             </button>
                         </div>
-                    </div>
-                </div>
 
-                {/* Right Side: Recent Files */}
-                <div style={{
-                    width: '320px',
-                    background: 'rgba(0, 0, 0, 0.2)',
-                    padding: '32px',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                    <h3 style={{
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: 'rgba(255, 255, 255, 0.4)',
-                        marginBottom: '20px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                    }}>
-                        Recent Files
-                    </h3>
-
-                    <div style={{ flex: 1, overflowY: 'auto' }}>
-                        {recentFiles.length > 0 ? (
-                            recentFiles.map(file => (
-                                <div
-                                    key={file.id}
-                                    className="recent-item"
-                                    onClick={() => handleOpenRecent(file)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px',
-                                        padding: '12px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        color: 'rgba(255, 255, 255, 0.8)',
-                                        marginBottom: '8px',
-                                        transition: 'background 0.2s ease'
-                                    }}
-                                >
-                                    <Clock size={16} color="rgba(255, 255, 255, 0.4)" />
-                                    <div style={{ overflow: 'hidden' }}>
-                                        <div style={{ fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {file.name}
-                                        </div>
-                                        <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.3)' }}>
-                                            {new Date(file.lastOpened).toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div style={{
-                                color: 'rgba(255, 255, 255, 0.3)',
-                                fontSize: '13px',
-                                fontStyle: 'italic',
-                                marginTop: '20px',
-                                textAlign: 'center'
-                            }}>
-                                No recent files found.
-                            </div>
+                        {hasRecovery && (
+                            <button
+                                className="grok-btn secondary"
+                                onClick={handleRecoverSession}
+                                style={{ borderColor: 'rgba(255, 149, 0, 0.3)', color: '#FF9500' }}
+                            >
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <RotateCcw size={20} />
+                                    Recover Session
+                                </span>
+                                <ChevronRight size={16} style={{ opacity: 0.5 }} />
+                            </button>
                         )}
                     </div>
+
+                    {/* Recent Files */}
+                    <div>
+                        <h3 style={{
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            color: 'rgba(255, 255, 255, 0.3)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            marginBottom: '20px'
+                        }}>
+                            Recent
+                        </h3>
+                        <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '8px' }}>
+                            {recentFiles.length > 0 ? (
+                                recentFiles.map(file => (
+                                    <div
+                                        key={file.id}
+                                        className="grok-recent-item"
+                                        onClick={() => handleOpenRecent(file)}
+                                    >
+                                        <Clock size={14} style={{ opacity: 0.4 }} />
+                                        <span style={{ fontSize: '14px', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {file.name}
+                                        </span>
+                                        <span style={{ fontSize: '12px', opacity: 0.3 }}>
+                                            {new Date(file.lastOpened).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ color: 'rgba(255, 255, 255, 0.2)', fontSize: '13px', fontStyle: 'italic' }}>
+                                    No recent canvases.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Footer Brand */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '48px',
+                    left: '64px',
+                    fontSize: '12px',
+                    color: 'rgba(255, 255, 255, 0.2)',
+                    fontWeight: 500,
+                    letterSpacing: '0.5px'
+                }}>
+                    Orama 2026, Rights Reserved
                 </div>
             </div>
+
+            {/* Right Panel - Brand (60%) */}
+            <div style={{
+                width: '60%',
+                height: '100%',
+                background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '600px',
+                    height: '600px',
+                    background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)',
+                    borderRadius: '50%',
+                    filter: 'blur(60px)'
+                }} />
+
+                <img
+                    src="/logo.png"
+                    alt="Logo"
+                    style={{
+                        width: '255px',
+                        height: 'auto',
+                        filter: 'brightness(0) invert(1) drop-shadow(0 0 30px rgba(255,255,255,0.2))',
+                        position: 'relative',
+                        zIndex: 10
+                    }}
+                />
+            </div>
+
             <style>{`
-                .welcome-btn:hover {
-                    background: rgba(255, 255, 255, 0.08) !important;
-                    transform: translateX(4px);
+                .grok-btn {
+                    width: 100%;
+                    padding: 20px 24px;
+                    border-radius: 999px; /* Pill shape */
+                    border: none;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 16px;
+                    font-weight: 500;
+                    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+                    text-align: left;
+                    font-family: 'Inter', sans-serif;
                 }
-                .recent-item:hover {
+                .grok-btn.primary {
+                    background: white;
+                    color: black;
+                }
+                .grok-btn.primary:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+                }
+                .grok-btn.secondary {
                     background: rgba(255, 255, 255, 0.05);
+                    color: white;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                .grok-btn.secondary:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-color: rgba(255, 255, 255, 0.2);
+                }
+                .grok-recent-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    color: rgba(255, 255, 255, 0.7);
+                    transition: all 0.2s ease;
+                }
+                .grok-recent-item:hover {
+                    background: rgba(255, 255, 255, 0.05);
+                    color: white;
                 }
                 .fade-out {
                     opacity: 0;
+                    transition: opacity 0.5s ease-out;
                     pointer-events: none;
                 }
             `}</style>
         </div>
     );
-};
-
-const buttonStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    width: '100%',
-    padding: '16px 20px',
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '12px',
-    color: 'white',
-    fontSize: '15px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    textAlign: 'left'
 };
 
 export default WelcomeScreen;

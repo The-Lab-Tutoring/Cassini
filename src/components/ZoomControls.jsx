@@ -36,7 +36,9 @@ const ZoomControls = () => {
             boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
             zIndex: 1000,
             color: isLight ? '#000' : '#fff',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            transform: 'scale(0.85)',
+            transformOrigin: 'bottom right'
         }}>
             <button
                 onClick={zoomOut}

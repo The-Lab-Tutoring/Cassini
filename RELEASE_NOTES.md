@@ -1,5 +1,52 @@
 # Cassini - Release Notes
 
+## Year 2026, Patch 1 (01/06/2026)
+
+### 📚 New Features
+
+- **40/60 Onboarding**: A completely redesigned, split-screen welcome experience with a focus on minimalism and instant action.
+- **Enhanced Export**: New unified export modal supporting PNG (up to 4K), SVG, PDF, and JSON, with options for selection-only and background transparency.
+- **Save for Later**: Select and save groups of elements to a dedicated panel for instant reuse across sessions.
+- **Smart Connectors**: Intelligent lines that snap to shapes and maintain connections while moving. Supports Straight, Elbow, and Curved styles.
+- **Power User Shortcuts**: Expanded keyboard control including `Alt+Arrow` alignment, `Shift+E` export, and more.
+
+### 💎 Polish & Refinements
+
+- **Theme Adaptation**: `SavedItems` and `SelectionToolbar` now fully support Light Mode and Liquid Glass themes with context-aware colors and borders.
+- **Smart Insertion**: Saved items now insert perfectly centered in your current viewport, rather than their original capture coordinates.
+- **Compact Zoom**: Scaled down zoom controls for a cleaner, less obtrusive footer interface.
+- **Brand Presence**: Enhanced Welcome Screen with larger typography and branding footer ("Cassini by Orama").
+- **Stability**: Fixed build issues related to duplicate imports and context destructuring.
+
+#### 🛠️ Internal Stability & Bug Fixes
+
+- **Shape Rendering**: Resolved a critical `ReferenceError: drawShape is not defined` that occurred when attempting to draw shapes or use the laser pointer.
+- **Rendering Refactor**: Successfully migrated the "current shape" and "ephemeral strokes" (laser) logic to the unified `drawElement` architecture, ensuring consistent and stable canvas performance.
+- **Export Stability**: Fixed a critical crash (`TypeError: length of undefined`) when opening the Export Modal by synchronizing the `selectedElements` state with the global Whiteboard Context.
+
+### 🏷️ 2026 Versioning Standard
+
+Starting in 2026, Cassini is moving to a dual-versioning system to better reflect public releases while maintaining technical integrity:
+
+- **Public Release Name**: Presented as `Year 2026, Patch # (Date)`. This is the user-facing versioning used for milestones and major updates (e.g., this release is **Y26P1**). This is so users can easily track and understand the release history, instead of being confused by the technical versioning like **Version 1.7.4.2**.
+
+- **Developer Version ID (DVI)**: A technical version (e.g., `1.8.0`) that remains synchronized with `package.json`. This ensures compatibility with build tools, dependencies, and file format standards while allowing the UI to use the new "Patch" naming convention. If you are someone who **likes** the technical versioning, you can still use it, just look at the bottom of each version (**Y26P1** and on) in these release notes to find it (does apply to releases on Github as well!).
+
+### 📕 2026 License Agreement (CSLA)
+
+Introduced on 12/31/25, the **Cassini Software License Agreement** (CSLA) is now the primary governing agreement for all users:
+
+- **Automatic Acceptance**: Downloading and using the software constitutes automatic agreement to the CSLA terms. This applies even if you access Cassini through the web app (Hosted on Vercel).
+- **Usage Terms**: Users agree to use Cassini in good faith and avoid any malicious purposes.
+- **Key Restrictions**: Commercial use is strictly prohibited. Modification of the software is not permitted without explicit authorization.
+- **Due Diligence**: Always, please read the CSLA before using the software. It is a non-negotiable agreement that is automatically accepted by downloading and using the software!
+- **Legal Action**: If you do not agree to the CSLA, you must immediately cease using the software and destroy all copies of it. Failure to comply with the CSLA may result in legal action.
+- **Contact**: For any questions or concerns, please see the `Readme.md` or `License.md` file. We will update this file after Y26P1 is released with the Discord Server link and more information.
+
+#### `Developer Version ID: 1.8.0`
+
+---
+
 ## v1.7.4.2 (2025-12-30)
 
 ### Bugfixing Colors & Glassmorphism
@@ -22,7 +69,7 @@ This update focuses on refining the tablet experience and addressing UI inconsis
 - **Theme-Aware Branding**: The "Creative Intelligence v1" indicator now dynamically adapts to Light Mode (White pill/Black text) and Liquid Glass Mode (Dark pill/White text).
 - **Branded Logo**: Integrated the official CI-v1 logo into the Settings Sidebar and Active Indicator.
 
-#### Bug Fixes
+#### 🛠️ Tablet & UI Fixes
 
 - **Full Screen Toggle**: Fixed the maximize button in the Zoom bar to correctly trigger the browser's native Full Screen mode instead of resetting zoom.
 - **Zoom Visibility**: Fixed an issue where zoom controls were invisible (white-on-white) in Light Mode.

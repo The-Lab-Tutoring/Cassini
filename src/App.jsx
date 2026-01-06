@@ -10,10 +10,22 @@ import WelcomeScreen from './components/WelcomeScreen';
 import SettingsSidebar from './components/SettingsSidebar';
 import SessionTimer from './components/SessionTimer';
 import CommandPalette from './components/CommandPalette';
+import SavedItems from './components/SavedItems';
+import ExportModal from './components/ExportModal';
 import './App.css';
 
 const MainLayout = () => {
-    const { setElements, updateBackground, setViewport, showWelcome, setShowWelcome, updateSettings, settings } = useWhiteboard();
+    const {
+        setElements,
+        updateBackground,
+        setViewport,
+        showWelcome,
+        setShowWelcome,
+        updateSettings,
+        settings,
+        showExportModal,
+        setShowExportModal
+    } = useWhiteboard();
     const focusMode = settings?.focusMode || false;
 
     const handleLoadFile = (data, filename) => {
@@ -45,6 +57,8 @@ const MainLayout = () => {
                 <BackgroundModal />
                 <SettingsSidebar />
                 <CommandPalette />
+                <SavedItems />
+                {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
                 {focusMode && (
                     <button
                         onClick={() => updateSettings({ focusMode: false })}

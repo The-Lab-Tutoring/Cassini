@@ -34,6 +34,7 @@ export const WhiteboardProvider = ({ children }) => {
     // Canvas elements
     const [elements, setElements] = useState([]);
     const [ephemeralElements, setEphemeralElements] = useState([]);
+    const [selectedElements, setSelectedElements] = useState([]);
     const [selectedElement, setSelectedElement] = useState(null);
 
     // Ruler and Protractor
@@ -51,6 +52,7 @@ export const WhiteboardProvider = ({ children }) => {
     const [showStickyModal, setShowStickyModal] = useState(false);
     const [showFrameModal, setShowFrameModal] = useState(false);
     const [showSettingsSidebar, setShowSettingsSidebar] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
     const [showWelcome, setShowWelcome] = useState(true);
 
     // Settings
@@ -353,6 +355,66 @@ export const WhiteboardProvider = ({ children }) => {
         };
     }, [showWelcome, elements, background, viewport, settings.userName]);
 
+    // Saved Items (Save for Later)
+    const [savedItems, setSavedItems] = useState(() => {
+        const saved = localStorage.getItem('cassini_saved_items');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const [showSavedItemsPanel, setShowSavedItemsPanel] = useState(false);
+
+    // Persist bookmarks & saved items
+    useEffect(() => {
+        // bookmarks persistence handled elsewhere or passed in props if needed
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('cassini_saved_items', JSON.stringify(savedItems));
+    }, [savedItems]);
+
+    // Saved Items helpers
+    const saveSelectionAsItem = useCallback((selectedElements, name) => {
+        if (!selectedElements || selectedElements.length === 0) return;
+
+        // Calculate bounds to normalize positions (make 0,0 top-left)
+        let minX = Infinity, minY = Infinity;
+        selectedElements.forEach(el => {
+            if (el.points) {
+                el.points.forEach(p => {
+                    minX = Math.min(minX, p.x);
+                    minY = Math.min(minY, p.y);
+                });
+            } else {
+                minX = Math.min(minX, el.x);
+                minY = Math.min(minY, el.y);
+            }
+        });
+
+        const normalizedElements = selectedElements.map(el => {
+            const newEl = { ...el };
+            if (newEl.points) {
+                newEl.points = newEl.points.map(p => ({ ...p, x: p.x - minX, y: p.y - minY }));
+            } else {
+                newEl.x = newEl.x - minX;
+                newEl.y = newEl.y - minY;
+            }
+            return newEl;
+        });
+
+        const newItem = {
+            id: Date.now().toString(),
+            name: name || `Saved Item ${savedItems.length + 1}`,
+            elements: normalizedElements,
+            createdAt: Date.now()
+        };
+
+        setSavedItems(prev => [...prev, newItem]);
+    }, [savedItems.length]);
+
+    const deleteSavedItem = useCallback((id) => {
+        setSavedItems(prev => prev.filter(item => item.id !== id));
+    }, []);
+
     const hasAutoSave = useCallback(() => {
         return localStorage.getItem(AUTO_SAVE_KEY) !== null;
     }, []);
@@ -377,6 +439,131 @@ export const WhiteboardProvider = ({ children }) => {
 
     const clearAutoSave = useCallback(() => {
         localStorage.removeItem(AUTO_SAVE_KEY);
+    }, []);
+
+    // Helper to get bounds of elements
+    const getBounds = (elements) => {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        elements.forEach(el => {
+            const x = el.x || (el.points ? Math.min(...el.points.map(p => p.x)) : 0);
+            const y = el.y || (el.points ? Math.min(...el.points.map(p => p.y)) : 0);
+            const width = el.width || (el.points ? Math.max(...el.points.map(p => p.x)) - x : 0);
+            const height = el.height || (el.points ? Math.max(...el.points.map(p => p.y)) - y : 0);
+
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + width);
+            maxY = Math.max(maxY, y + height);
+        });
+        return { minX, minY, maxX, maxY };
+    };
+
+    const alignElements = useCallback((selectedElements, type) => {
+        if (!selectedElements || selectedElements.length < 2) return;
+
+        const bounds = getBounds(selectedElements);
+        const selectedIds = selectedElements.map(el => el.id);
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+
+        setElements(prev => prev.map(el => {
+            if (!selectedIds.includes(el.id)) return el;
+
+            let newX = el.x;
+            let newY = el.y;
+            let newPoints = el.points;
+
+            if (el.points) {
+                const elBounds = getBounds([el]);
+                const elCenterX = (elBounds.minX + elBounds.maxX) / 2;
+                const elCenterY = (elBounds.minY + elBounds.maxY) / 2;
+
+                let offsetX = 0;
+                let offsetY = 0;
+
+                switch (type) {
+                    case 'left': offsetX = bounds.minX - elBounds.minX; break;
+                    case 'centerH': offsetX = centerX - elCenterX; break;
+                    case 'right': offsetX = bounds.maxX - elBounds.maxX; break;
+                    case 'top': offsetY = bounds.minY - elBounds.minY; break;
+                    case 'centerV': offsetY = centerY - elCenterY; break;
+                    case 'bottom': offsetY = bounds.maxY - elBounds.maxY; break;
+                }
+
+                newPoints = el.points.map(p => ({ x: p.x + offsetX, y: p.y + offsetY }));
+                return { ...el, points: newPoints };
+            } else {
+                const elWidth = el.width || 0;
+                const elHeight = el.height || 0;
+
+                switch (type) {
+                    case 'left': newX = bounds.minX; break;
+                    case 'centerH': newX = centerX - elWidth / 2; break;
+                    case 'right': newX = bounds.maxX - elWidth; break;
+                    case 'top': newY = bounds.minY; break;
+                    case 'centerV': newY = centerY - elHeight / 2; break;
+                    case 'bottom': newY = bounds.maxY - elHeight; break;
+                }
+                return { ...el, x: newX, y: newY };
+            }
+        }));
+    }, []);
+
+    const distributeElements = useCallback((selectedElements, type) => {
+        if (!selectedElements || selectedElements.length < 3) return;
+
+        const elementsWithBounds = selectedElements.map(el => ({ ...el, bounds: getBounds([el]) }));
+
+        if (type === 'horizontal') {
+            elementsWithBounds.sort((a, b) => a.bounds.minX - b.bounds.minX);
+            const totalBounds = getBounds(selectedElements);
+            const totalWidth = elementsWithBounds.reduce((sum, el) => sum + (el.bounds.maxX - el.bounds.minX), 0);
+            const spacing = (totalBounds.maxX - totalBounds.minX - totalWidth) / (elementsWithBounds.length - 1);
+
+            let currentX = totalBounds.minX;
+            const updates = {};
+            elementsWithBounds.forEach(el => {
+                updates[el.id] = currentX - el.bounds.minX;
+                currentX += (el.bounds.maxX - el.bounds.minX) + spacing;
+            });
+
+            setElements(prev => prev.map(el => {
+                if (updates[el.id] === undefined) return el;
+                const offset = updates[el.id];
+                if (el.points) return { ...el, points: el.points.map(p => ({ ...p, x: p.x + offset })) };
+                return { ...el, x: (el.x || 0) + offset };
+            }));
+        } else { // vertical
+            elementsWithBounds.sort((a, b) => a.bounds.minY - b.bounds.minY);
+            const totalBounds = getBounds(selectedElements);
+            const totalHeight = elementsWithBounds.reduce((sum, el) => sum + (el.bounds.maxY - el.bounds.minY), 0);
+            const spacing = (totalBounds.maxY - totalBounds.minY - totalHeight) / (elementsWithBounds.length - 1);
+
+            let currentY = totalBounds.minY;
+            const updates = {};
+            elementsWithBounds.forEach(el => {
+                updates[el.id] = currentY - el.bounds.minY;
+                currentY += (el.bounds.maxY - el.bounds.minY) + spacing;
+            });
+
+            setElements(prev => prev.map(el => {
+                if (updates[el.id] === undefined) return el;
+                const offset = updates[el.id];
+                if (el.points) return { ...el, points: el.points.map(p => ({ ...p, y: p.y + offset })) };
+                return { ...el, y: (el.y || 0) + offset };
+            }));
+        }
+    }, []);
+
+    const reorderElements = useCallback((selectedElements, type) => {
+        if (!selectedElements || selectedElements.length === 0) return;
+        const selectedIds = selectedElements.map(el => el.id);
+
+        setElements(prev => {
+            const other = prev.filter(el => !selectedIds.includes(el.id));
+            const selected = prev.filter(el => selectedIds.includes(el.id));
+            return type === 'front' ? [...other, ...selected] : [...selected, ...other];
+        });
     }, []);
 
     const value = {
@@ -435,6 +622,13 @@ export const WhiteboardProvider = ({ children }) => {
         updateSettings,
         showSettingsSidebar,
         setShowSettingsSidebar,
+        showSavedItemsPanel,
+        setShowSavedItemsPanel,
+        showExportModal,
+        setShowExportModal,
+        savedItems,
+        saveSelectionAsItem,
+        deleteSavedItem,
         showWelcome,
         setShowWelcome,
         hasAutoSave,
@@ -444,7 +638,12 @@ export const WhiteboardProvider = ({ children }) => {
         updateCiSettings,
         ephemeralElements,
         addEphemeralElement,
-        removeEphemeralElement
+        removeEphemeralElement,
+        selectedElements,
+        setSelectedElements,
+        alignElements,
+        distributeElements,
+        reorderElements
     };
 
     return (

@@ -10,6 +10,7 @@ import ZoomControls from './ZoomControls';
 
 import { saveWhiteboard } from '../utils/fileUtils';
 import { recognizeHandwriting } from '../utils/ocrUtils';
+import { drawGrid, drawElement } from '../utils/renderUtils';
 
 
 // Helper to get anchor points for a shape
@@ -33,7 +34,6 @@ const Whiteboard = () => {
     const [draggedElement, setDraggedElement] = useState(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [selectionBox, setSelectionBox] = useState(null);
-    const [selectedElements, setSelectedElements] = useState([]);
     const [isErasing, setIsErasing] = useState(false);
     const [isPanning, setIsPanning] = useState(false);
     const [touchCount, setTouchCount] = useState(0); // Track active touches
@@ -54,6 +54,8 @@ const Whiteboard = () => {
         updateElement,
         bulkUpdateElements,
         deleteElement,
+        selectedElements,
+        setSelectedElements,
         ruler,
         setRuler,
         protractor,
@@ -79,7 +81,14 @@ const Whiteboard = () => {
         setShowFrameModal,
         ephemeralElements,
         addEphemeralElement,
-        removeEphemeralElement
+        removeEphemeralElement,
+        alignElements,
+        distributeElements,
+        setShowExportModal,
+        addBookmark,
+        setShowBookmarksPanel,
+        saveSelectionAsItem,
+        setShowSavedItemsPanel
     } = useWhiteboard();
 
     // Initialize canvas
@@ -184,6 +193,47 @@ const Whiteboard = () => {
                 } else if (e.key === 'o') { // Ctrl+O to Open
                     e.preventDefault();
                     document.getElementById('toolbar-file-input')?.click();
+                } else if (e.key === 'E') { // Shift+E to Export
+                    e.preventDefault();
+                    setShowExportModal(true);
+                }
+            }
+
+            // Alignment Shortcuts (Alt + Key)
+            if (e.altKey && !e.ctrlKey && !e.shiftKey && selectedElements.length > 1) {
+                switch (e.key.toLowerCase()) {
+                    case 'l':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'left');
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'centerH');
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'right');
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'top');
+                        break;
+                    case 'm':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'centerV');
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        alignElements(selectedElements, 'bottom');
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        distributeElements(selectedElements, 'horizontal');
+                        break;
+                    case 'v':
+                        e.preventDefault();
+                        distributeElements(selectedElements, 'vertical');
+                        break;
                 }
             }
 
@@ -201,7 +251,9 @@ const Whiteboard = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [setActiveTool, undo, redo, selectedElements, copyElements, pasteElements, duplicateElements, selectAll, deselectAll]);
+    }, [setActiveTool, undo, redo, selectedElements, copyElements, pasteElements, duplicateElements,
+        selectAll, deselectAll, addBookmark, setShowBookmarksPanel, saveSelectionAsItem,
+        setShowSavedItemsPanel, alignElements, distributeElements, setShowExportModal]);
 
     // Redraw canvas whenever elements change
     useEffect(() => {
@@ -266,354 +318,7 @@ const Whiteboard = () => {
 
 
 
-    const drawStroke = (ctx, element) => {
-        if (!element.points || element.points.length === 0) return;
 
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = element.color;
-        ctx.globalAlpha = element.opacity;
-
-        // If we have pressure data, draw segments with varying width
-        if (element.points[0].pressure !== undefined) {
-            for (let i = 1; i < element.points.length; i++) {
-                const p1 = element.points[i - 1];
-                const p2 = element.points[i];
-
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-
-                // Calculate thickness based on pressure
-                const pressure = p2.pressure || 0.5;
-                const dynamicThickness = Math.max(1, element.thickness * pressure * 2);
-
-                ctx.lineWidth = dynamicThickness;
-                ctx.stroke();
-            }
-        } else {
-            // Fallback for old strokes without pressure
-            ctx.beginPath();
-            ctx.lineWidth = element.thickness;
-            ctx.moveTo(element.points[0].x, element.points[0].y);
-            for (let i = 1; i < element.points.length; i++) {
-                ctx.lineTo(element.points[i].x, element.points[i].y);
-            }
-            ctx.stroke();
-        }
-
-        ctx.globalAlpha = 1;
-    };
-
-    const drawText = (ctx, element) => {
-        ctx.save();
-        ctx.globalAlpha = element.opacity || 1;
-
-        // Build font string with bold/italic
-        const fontWeight = element.bold ? 'bold' : 'normal';
-        const fontStyle = element.italic ? 'italic' : 'normal';
-        ctx.font = `${fontStyle} ${fontWeight} ${element.fontSize}px ${element.fontFamily}`;
-        ctx.fillStyle = element.color;
-
-        // Handle multi-line text
-        const lines = element.text.split('\n');
-        const lineHeight = element.fontSize * 1.2;
-
-        // Measure text for background and alignment
-        let maxWidth = 0;
-        lines.forEach(line => {
-            const metrics = ctx.measureText(line);
-            maxWidth = Math.max(maxWidth, metrics.width);
-        });
-        const totalHeight = lines.length * lineHeight;
-
-        // Draw background if present
-        if (element.backgroundColor) {
-            ctx.fillStyle = element.backgroundColor;
-            const padding = 8;
-            ctx.fillRect(
-                element.x - padding,
-                element.y - element.fontSize - padding,
-                maxWidth + padding * 2,
-                totalHeight + padding * 2
-            );
-            ctx.fillStyle = element.color; // Reset fill color for text
-        }
-
-        // Draw each line
-        lines.forEach((line, index) => {
-            let xPos = element.x;
-
-            // Handle text alignment
-            if (element.textAlign === 'center') {
-                const lineWidth = ctx.measureText(line).width;
-                xPos = element.x + (maxWidth - lineWidth) / 2;
-            } else if (element.textAlign === 'right') {
-                const lineWidth = ctx.measureText(line).width;
-                xPos = element.x + maxWidth - lineWidth;
-            }
-
-            const yPos = element.y + (index * lineHeight);
-
-            // Draw text
-            ctx.fillText(line, xPos, yPos);
-
-            // Draw underline if enabled
-            if (element.underline) {
-                const lineWidth = ctx.measureText(line).width;
-                ctx.beginPath();
-                ctx.strokeStyle = element.color;
-                ctx.lineWidth = Math.max(1, element.fontSize / 15);
-                ctx.moveTo(xPos, yPos + 3);
-                ctx.lineTo(xPos + lineWidth, yPos + 3);
-                ctx.stroke();
-            }
-        });
-
-        ctx.restore();
-    };
-
-    const drawEquation = (ctx, element) => {
-        if (element.html) {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.fontSize = `${element.fontSize}px`;
-            tempDiv.style.color = element.color;
-            tempDiv.innerHTML = element.html;
-            document.body.appendChild(tempDiv);
-
-            const svg = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="${element.width}" height="${element.height}">
-                    <foreignObject width="100%" height="100%">
-                        <div xmlns="http://www.w3.org/1999/xhtml" style="font-size: ${element.fontSize}px; color: ${element.color}; padding: 10px;">
-                            ${element.html}
-                        </div>
-                    </foreignObject>
-                </svg>
-            `;
-
-            const img = new Image();
-            const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-
-            img.onload = () => {
-                ctx.globalAlpha = element.opacity || 1;
-                ctx.drawImage(img, element.x, element.y, element.width, element.height);
-                ctx.globalAlpha = 1;
-                URL.revokeObjectURL(url);
-                document.body.removeChild(tempDiv);
-            };
-
-            img.src = url;
-        }
-    };
-
-    const drawShape = (ctx, element) => {
-        ctx.save();
-        ctx.strokeStyle = element.color;
-        ctx.lineWidth = element.thickness;
-        ctx.globalAlpha = element.opacity;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        // Apply rotation if present
-        if (element.rotation) {
-            const centerX = element.x + element.width / 2;
-            const centerY = element.y + element.height / 2;
-            ctx.translate(centerX, centerY);
-            ctx.rotate(element.rotation * Math.PI / 180);
-            ctx.translate(-centerX, -centerY);
-        }
-
-        if (element.type === 'rectangle') {
-            // Draw fill if present
-            if (element.fillColor && element.fillOpacity > 0) {
-                ctx.fillStyle = element.fillColor;
-                ctx.globalAlpha = element.fillOpacity;
-                ctx.fillRect(element.x, element.y, element.width, element.height);
-                ctx.globalAlpha = 1;
-            }
-            // Draw stroke
-            ctx.strokeRect(element.x, element.y, element.width, element.height);
-        } else if (element.type === 'circle') {
-            ctx.beginPath();
-            ctx.ellipse(
-                element.x + element.width / 2,
-                element.y + element.height / 2,
-                Math.abs(element.width / 2),
-                Math.abs(element.height / 2),
-                0, 0, 2 * Math.PI
-            );
-            // Draw fill if present
-            if (element.fillColor && element.fillOpacity > 0) {
-                ctx.fillStyle = element.fillColor;
-                ctx.globalAlpha = element.fillOpacity;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-            // Draw stroke
-            ctx.stroke();
-        } else if (element.type === 'line') {
-            ctx.beginPath();
-            ctx.moveTo(element.x, element.y);
-            ctx.lineTo(element.x + element.width, element.y + element.height);
-            ctx.stroke();
-        } else if (element.type === 'arrow') {
-            const startX = element.x;
-            const startY = element.y;
-            const endX = element.x + element.width;
-            const endY = element.y + element.height;
-
-            // Draw line
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(endX, endY);
-            ctx.stroke();
-
-            // Draw arrowhead
-            const angle = Math.atan2(endY - startY, endX - startX);
-            const headLength = element.thickness * 4;
-
-            ctx.beginPath();
-            ctx.moveTo(endX, endY);
-            ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 6), endY - headLength * Math.sin(angle - Math.PI / 6));
-            ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 6), endY - headLength * Math.sin(angle + Math.PI / 6));
-            ctx.lineTo(endX, endY);
-            ctx.fillStyle = element.color;
-            ctx.fill();
-        }
-        ctx.restore();
-    };
-
-    const drawSticky = (ctx, element) => {
-        ctx.save();
-        ctx.globalAlpha = element.opacity || 1;
-
-        // Shadow for depth
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-
-        // Note background
-        ctx.fillStyle = element.color || '#FFEB3B';
-        const radius = 5;
-        const x = element.x;
-        const y = element.y;
-        const w = element.width;
-        const h = element.height;
-
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + w - radius, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-        ctx.lineTo(x + w, y + h - radius);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-        ctx.lineTo(x + radius, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-        ctx.fill();
-
-        // Reset shadow for text
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-
-        // Render text
-        if (element.text) {
-            ctx.fillStyle = '#333333';
-            ctx.font = `${element.fontSize || 16}px Inter`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            // Simple text wrapping for sticky
-            const padding = 20;
-            const maxWidth = w - padding * 2;
-            const words = element.text.split(' ');
-            let line = '';
-            let lines = [];
-            const lineHeight = (element.fontSize || 16) * 1.2;
-
-            for (let n = 0; n < words.length; n++) {
-                let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
-                let testWidth = metrics.width;
-                if (testWidth > maxWidth && n > 0) {
-                    lines.push(line);
-                    line = words[n] + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            lines.push(line);
-
-            const totalTextHeight = lines.length * lineHeight;
-            let startY = y + (h - totalTextHeight) / 2 + lineHeight / 2;
-
-            lines.forEach((l, i) => {
-                ctx.fillText(l.trim(), x + w / 2, startY + i * lineHeight);
-            });
-        }
-
-        ctx.restore();
-    };
-
-    const drawFrame = (ctx, element) => {
-        ctx.save();
-        ctx.globalAlpha = element.opacity || 1;
-
-        // Frame background (semi-transparent)
-        ctx.fillStyle = element.color || 'rgba(0, 122, 255, 0.05)';
-        ctx.fillRect(element.x, element.y, element.width, element.height);
-
-        // Frame border (dashed)
-        ctx.strokeStyle = '#007AFF';
-        ctx.lineWidth = 2 / viewport.scale;
-        ctx.setLineDash([10 / viewport.scale, 5 / viewport.scale]);
-        ctx.strokeRect(element.x, element.y, element.width, element.height);
-        ctx.setLineDash([]);
-
-        // Label
-        ctx.fillStyle = '#007AFF';
-        ctx.font = `bold ${14 / viewport.scale}px Inter`;
-        ctx.fillText(element.name || 'Frame', element.x + 5 / viewport.scale, element.y - 10 / viewport.scale);
-
-        ctx.restore();
-    };
-
-    const drawImage = (ctx, element) => {
-        if (!element.src) return;
-
-        let img = imageCache.current.get(element.src);
-        if (!img) {
-            img = new Image();
-            img.src = element.src;
-            img.onload = () => {
-                imageCache.current.set(element.src, img);
-                redrawCanvas(); // Force redraw once loaded
-            };
-            return; // Don't draw yet
-        }
-
-        ctx.save();
-        ctx.globalAlpha = element.opacity || 1;
-
-        // Apply rotation if present
-        if (element.rotation) {
-            const centerX = element.x + element.width / 2;
-            const centerY = element.y + element.height / 2;
-            ctx.translate(centerX, centerY);
-            ctx.rotate(element.rotation * Math.PI / 180);
-            ctx.translate(-centerX, -centerY);
-        }
-
-        ctx.drawImage(img, element.x, element.y, element.width, element.height);
-        ctx.globalAlpha = 1;
-        ctx.restore();
-    };
 
     // Get resize handle positions for an element
     const getResizeHandles = (element) => {
@@ -878,53 +583,7 @@ const Whiteboard = () => {
         }
     };
 
-    const drawGrid = (ctx) => {
-        if (background.gridType === 'none') return;
 
-        const { gridType, gridSize, gridColor } = background;
-        const width = canvasRef.current.width;
-        const height = canvasRef.current.height;
-
-        ctx.save();
-        ctx.strokeStyle = gridColor;
-        ctx.fillStyle = gridColor;
-
-        if (gridType === 'dots') {
-            // Draw dots at grid intersections
-            for (let x = gridSize; x < width; x += gridSize) {
-                for (let y = gridSize; y < height; y += gridSize) {
-                    ctx.beginPath();
-                    ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-        } else if (gridType === 'lines') {
-            // Draw vertical and horizontal lines
-            ctx.lineWidth = 0.5;
-            for (let x = gridSize; x < width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, height);
-                ctx.stroke();
-            }
-            for (let y = gridSize; y < height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-            }
-        } else if (gridType === 'squares') {
-            // Draw grid of square outlines
-            ctx.lineWidth = 0.5;
-            for (let x = 0; x < width; x += gridSize) {
-                for (let y = 0; y < height; y += gridSize) {
-                    ctx.strokeRect(x, y, gridSize, gridSize);
-                }
-            }
-        }
-
-        ctx.restore();
-    };
 
     const redrawCanvas = () => {
         const canvas = canvasRef.current;
@@ -938,7 +597,7 @@ const Whiteboard = () => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw grid (before viewport transformations)
-        drawGrid(ctx);
+        drawGrid(ctx, canvas.width, canvas.height, background);
 
         ctx.save();
         ctx.translate(viewport.x, viewport.y);
@@ -946,21 +605,11 @@ const Whiteboard = () => {
 
         // Draw all elements (filter out hidden ones)
         elements.filter(el => el.visible !== false).forEach(element => {
-            if (element.type === 'stroke') {
-                drawStroke(ctx, element);
-            } else if (element.type === 'text') {
-                drawText(ctx, element);
-            } else if (element.type === 'equation') {
-                drawEquation(ctx, element);
-            } else if (['rectangle', 'circle', 'line', 'arrow'].includes(element.type)) {
-                drawShape(ctx, element);
-            } else if (element.type === 'image') {
-                drawImage(ctx, element);
-            } else if (element.type === 'sticky') {
-                drawSticky(ctx, element);
-            } else if (element.type === 'frame') {
-                drawFrame(ctx, element);
-            }
+            drawElement(ctx, element, {
+                imageCache: imageCache.current,
+                onImageLoad: redrawCanvas,
+                scale: viewport.scale
+            });
         });
 
         // Draw ephemeral elements (laser pointer)
@@ -973,14 +622,14 @@ const Whiteboard = () => {
                 ctx.globalAlpha = opacity;
                 ctx.shadowBlur = 10 * opacity;
                 ctx.shadowColor = element.color || '#FF2D55';
-                drawStroke(ctx, element);
+                drawElement(ctx, { ...element, opacity });
                 ctx.restore();
             }
         });
 
         // Draw current shape preview
         if (currentShape) {
-            drawShape(ctx, currentShape);
+            drawElement(ctx, currentShape);
         }
 
         // Draw ruler and protractor

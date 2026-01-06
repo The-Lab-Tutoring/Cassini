@@ -12,210 +12,31 @@ import {
     Layers,
     GripHorizontal,
     GripVertical,
-    Type
+    Type,
+    Package
 } from 'lucide-react';
 import { useWhiteboard } from '../context/WhiteboardContext';
 
 const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR, enableOCR }) => {
-    const { elements, setElements } = useWhiteboard();
+    const {
+        saveSelectionAsItem,
+        setShowSavedItemsPanel,
+        alignElements,
+        distributeElements,
+        reorderElements,
+        settings
+    } = useWhiteboard();
 
     if (!selectedElements || selectedElements.length === 0) return null;
 
-    // Get bounds of selected elements
-    const getBounds = (elements) => {
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        elements.forEach(el => {
-            const x = el.x || (el.points ? Math.min(...el.points.map(p => p.x)) : 0);
-            const y = el.y || (el.points ? Math.min(...el.points.map(p => p.y)) : 0);
-            const width = el.width || (el.points ? Math.max(...el.points.map(p => p.x)) - x : 0);
-            const height = el.height || (el.points ? Math.max(...el.points.map(p => p.y)) - y : 0);
+    const isLight = settings?.iconTheme === 'light';
 
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x + width);
-            maxY = Math.max(maxY, y + height);
-        });
-        return { minX, minY, maxX, maxY };
-    };
-
-    // Alignment functions - use batch updates
-    const alignLeft = () => {
-        const bounds = getBounds(selectedElements);
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const offset = bounds.minX - Math.min(...el.points.map(p => p.x));
-                return { ...el, points: el.points.map(p => ({ ...p, x: p.x + offset })) };
-            }
-            return { ...el, x: bounds.minX };
-        }));
-    };
-
-    const alignCenterH = () => {
-        const bounds = getBounds(selectedElements);
-        const centerX = (bounds.minX + bounds.maxX) / 2;
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const elBounds = getBounds([el]);
-                const elCenterX = (elBounds.minX + elBounds.maxX) / 2;
-                const offset = centerX - elCenterX;
-                return { ...el, points: el.points.map(p => ({ ...p, x: p.x + offset })) };
-            }
-            const elWidth = el.width || 0;
-            return { ...el, x: centerX - elWidth / 2 };
-        }));
-    };
-
-    const alignRight = () => {
-        const bounds = getBounds(selectedElements);
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const elMaxX = Math.max(...el.points.map(p => p.x));
-                const offset = bounds.maxX - elMaxX;
-                return { ...el, points: el.points.map(p => ({ ...p, x: p.x + offset })) };
-            }
-            const elWidth = el.width || 0;
-            return { ...el, x: bounds.maxX - elWidth };
-        }));
-    };
-
-    const alignTop = () => {
-        const bounds = getBounds(selectedElements);
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const offset = bounds.minY - Math.min(...el.points.map(p => p.y));
-                return { ...el, points: el.points.map(p => ({ ...p, y: p.y + offset })) };
-            }
-            return { ...el, y: bounds.minY };
-        }));
-    };
-
-    const alignCenterV = () => {
-        const bounds = getBounds(selectedElements);
-        const centerY = (bounds.minY + bounds.maxY) / 2;
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const elBounds = getBounds([el]);
-                const elCenterY = (elBounds.minY + elBounds.maxY) / 2;
-                const offset = centerY - elCenterY;
-                return { ...el, points: el.points.map(p => ({ ...p, y: p.y + offset })) };
-            }
-            const elHeight = el.height || 0;
-            return { ...el, y: centerY - elHeight / 2 };
-        }));
-    };
-
-    const alignBottom = () => {
-        const bounds = getBounds(selectedElements);
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => prev.map(el => {
-            if (!selectedIds.includes(el.id)) return el;
-            if (el.points) {
-                const elMaxY = Math.max(...el.points.map(p => p.y));
-                const offset = bounds.maxY - elMaxY;
-                return { ...el, points: el.points.map(p => ({ ...p, y: p.y + offset })) };
-            }
-            const elHeight = el.height || 0;
-            return { ...el, y: bounds.maxY - elHeight };
-        }));
-    };
-
-    // Z-Order functions
-    const bringToFront = () => {
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => {
-            const other = prev.filter(el => !selectedIds.includes(el.id));
-            const selected = prev.filter(el => selectedIds.includes(el.id));
-            return [...other, ...selected];
-        });
-    };
-
-    const sendToBack = () => {
-        const selectedIds = selectedElements.map(el => el.id);
-        setElements(prev => {
-            const other = prev.filter(el => !selectedIds.includes(el.id));
-            const selected = prev.filter(el => selectedIds.includes(el.id));
-            return [...selected, ...other];
-        });
-    };
-
-    // Distribute functions
-    const distributeHorizontal = () => {
-        if (selectedElements.length < 3) return;
-
-        // Get element bounds and sort by x position
-        const elementsWithBounds = selectedElements.map(el => {
-            const bounds = getBounds([el]);
-            return { ...el, bounds };
-        }).sort((a, b) => a.bounds.minX - b.bounds.minX);
-
-        const totalBounds = getBounds(selectedElements);
-        const totalWidth = elementsWithBounds.reduce((sum, el) =>
-            sum + (el.bounds.maxX - el.bounds.minX), 0);
-        const spacing = (totalBounds.maxX - totalBounds.minX - totalWidth) / (elementsWithBounds.length - 1);
-
-        let currentX = totalBounds.minX;
-        const updates = {};
-
-        elementsWithBounds.forEach(el => {
-            const elWidth = el.bounds.maxX - el.bounds.minX;
-            const offset = currentX - el.bounds.minX;
-            updates[el.id] = offset;
-            currentX += elWidth + spacing;
-        });
-
-        setElements(prev => prev.map(el => {
-            if (updates[el.id] === undefined) return el;
-            const offset = updates[el.id];
-            if (el.points) {
-                return { ...el, points: el.points.map(p => ({ ...p, x: p.x + offset })) };
-            }
-            return { ...el, x: (el.x || 0) + offset };
-        }));
-    };
-
-    const distributeVertical = () => {
-        if (selectedElements.length < 3) return;
-
-        // Get element bounds and sort by y position
-        const elementsWithBounds = selectedElements.map(el => {
-            const bounds = getBounds([el]);
-            return { ...el, bounds };
-        }).sort((a, b) => a.bounds.minY - b.bounds.minY);
-
-        const totalBounds = getBounds(selectedElements);
-        const totalHeight = elementsWithBounds.reduce((sum, el) =>
-            sum + (el.bounds.maxY - el.bounds.minY), 0);
-        const spacing = (totalBounds.maxY - totalBounds.minY - totalHeight) / (elementsWithBounds.length - 1);
-
-        let currentY = totalBounds.minY;
-        const updates = {};
-
-        elementsWithBounds.forEach(el => {
-            const elHeight = el.bounds.maxY - el.bounds.minY;
-            const offset = currentY - el.bounds.minY;
-            updates[el.id] = offset;
-            currentY += elHeight + spacing;
-        });
-
-        setElements(prev => prev.map(el => {
-            if (updates[el.id] === undefined) return el;
-            const offset = updates[el.id];
-            if (el.points) {
-                return { ...el, points: el.points.map(p => ({ ...p, y: p.y + offset })) };
-            }
-            return { ...el, y: (el.y || 0) + offset };
-        }));
-    };
+    // Theme-aware styles
+    const textColor = isLight ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+    const labelColor = isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+    const dividerColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)';
+    const panelBg = isLight ? 'rgba(255, 255, 255, 0.85)' : undefined; // Default glass for dark
+    const panelBorder = isLight ? '1px solid rgba(0, 0, 0, 0.1)' : undefined;
 
     const showAlignTools = selectedElements.length > 1;
     const showDistributeTools = selectedElements.length > 2;
@@ -234,13 +55,16 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
                 flexDirection: 'column',
                 gap: '12px',
                 minWidth: '200px',
-                pointerEvents: 'auto'
+                pointerEvents: 'auto',
+                background: panelBg,
+                border: panelBorder,
+                color: textColor
             }}
         >
             {/* Header with count */}
             <div style={{
                 fontSize: '12px',
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: textColor,
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
@@ -253,27 +77,27 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
             {/* Alignment Tools - only show when multiple selected */}
             {showAlignTools && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '10px', color: labelColor, textTransform: 'uppercase' }}>
                         Align
                     </div>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                        <ToolButton onClick={alignLeft} title="Align Left">
+                        <ToolButton onClick={() => alignElements(selectedElements, 'left')} title="Align Left">
                             <AlignLeft size={16} />
                         </ToolButton>
-                        <ToolButton onClick={alignCenterH} title="Align Center">
+                        <ToolButton onClick={() => alignElements(selectedElements, 'centerH')} title="Align Center">
                             <AlignCenterHorizontal size={16} />
                         </ToolButton>
-                        <ToolButton onClick={alignRight} title="Align Right">
+                        <ToolButton onClick={() => alignElements(selectedElements, 'right')} title="Align Right">
                             <AlignRight size={16} />
                         </ToolButton>
-                        <div style={{ width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 4px' }} />
-                        <ToolButton onClick={alignTop} title="Align Top">
+                        <div style={{ width: '1px', background: dividerColor, margin: '0 4px' }} />
+                        <ToolButton onClick={() => alignElements(selectedElements, 'top')} title="Align Top">
                             <AlignStartVertical size={16} />
                         </ToolButton>
-                        <ToolButton onClick={alignCenterV} title="Align Middle">
+                        <ToolButton onClick={() => alignElements(selectedElements, 'centerV')} title="Align Middle">
                             <AlignCenterVertical size={16} />
                         </ToolButton>
-                        <ToolButton onClick={alignBottom} title="Align Bottom">
+                        <ToolButton onClick={() => alignElements(selectedElements, 'bottom')} title="Align Bottom">
                             <AlignEndVertical size={16} />
                         </ToolButton>
                     </div>
@@ -283,14 +107,14 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
             {/* Distribute Tools - only show when 3+ selected */}
             {showDistributeTools && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '10px', color: labelColor, textTransform: 'uppercase' }}>
                         Distribute
                     </div>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                        <ToolButton onClick={distributeHorizontal} title="Distribute Horizontally">
+                        <ToolButton onClick={() => distributeElements(selectedElements, 'horizontal')} title="Distribute Horizontally">
                             <GripHorizontal size={16} />
                         </ToolButton>
-                        <ToolButton onClick={distributeVertical} title="Distribute Vertically">
+                        <ToolButton onClick={() => distributeElements(selectedElements, 'vertical')} title="Distribute Vertically">
                             <GripVertical size={16} />
                         </ToolButton>
                     </div>
@@ -299,14 +123,14 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
 
             {/* Z-Order Tools */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '10px', color: labelColor, textTransform: 'uppercase' }}>
                     Order
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <ToolButton onClick={bringToFront} title="Bring to Front">
+                    <ToolButton onClick={() => reorderElements(selectedElements, 'front')} title="Bring to Front">
                         <ArrowUpToLine size={16} />
                     </ToolButton>
-                    <ToolButton onClick={sendToBack} title="Send to Back">
+                    <ToolButton onClick={() => reorderElements(selectedElements, 'back')} title="Send to Back">
                         <ArrowDownToLine size={16} />
                     </ToolButton>
                 </div>
@@ -315,7 +139,7 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
             {/* Actions Section */}
             {selectedElements.some(el => el.type === 'stroke') && enableOCR && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '10px', color: labelColor, textTransform: 'uppercase' }}>
                         Intelligence
                     </div>
                     <button
@@ -340,6 +164,35 @@ const SelectionToolbar = ({ selectedElements, onDelete, onUpdateElements, onOCR,
                     </button>
                 </div>
             )}
+
+            {/* Save for Later Button */}
+            <button
+                className="glass-button"
+                onClick={() => {
+                    const name = window.prompt('Name this group:', 'Saved Item');
+                    if (name) {
+                        saveSelectionAsItem(selectedElements, name);
+                        setShowSavedItemsPanel(true);
+                    }
+                }}
+                title="Save for Later (Shift+S)"
+                style={{
+                    width: '100%',
+                    padding: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    background: 'rgba(0, 122, 255, 0.1)',
+                    color: '#007AFF',
+                    fontWeight: 500,
+                    fontSize: '13px',
+                    marginBottom: '8px'
+                }}
+            >
+                <Package size={16} />
+                Save
+            </button>
 
             {/* Delete Button */}
             <button
@@ -379,7 +232,8 @@ const ToolButton = ({ children, onClick, title, active }) => (
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: active ? 'rgba(0, 122, 255, 0.3)' : 'transparent'
+            background: active ? 'rgba(0, 122, 255, 0.3)' : 'transparent',
+            color: 'inherit'
         }}
     >
         {children}

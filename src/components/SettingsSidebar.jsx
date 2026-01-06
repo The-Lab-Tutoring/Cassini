@@ -355,7 +355,7 @@ const SettingsSidebar = () => {
                                 filter: isLight ? 'brightness(0) opacity(0.6)' : 'brightness(0) invert(1) opacity(0.6)'
                             }}
                         />
-                        <span>Cassini v1.7.4.2</span>
+                        <span>Version Y26P1</span>
                     </div>
                     <div style={{ fontSize: '10px', color: isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <img

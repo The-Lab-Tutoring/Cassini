@@ -33,7 +33,8 @@ import {
     Box,
     StickyNote,
     Layout,
-    Sparkles
+    Sparkles,
+    Package
 } from 'lucide-react';
 import { saveWhiteboard, loadWhiteboard } from '../utils/fileUtils';
 
@@ -65,7 +66,10 @@ const Toolbar = () => {
         setShowFrameModal,
         settings,
         updateSettings,
-        ciSettings
+        ciSettings,
+        showSavedItemsPanel,
+        setShowSavedItemsPanel,
+        setShowExportModal
     } = useWhiteboard();
 
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -436,26 +440,10 @@ const Toolbar = () => {
                             </div>
                             <TextToolButton
                                 tool={{
-                                    id: 'export-png',
-                                    icon: ImageIcon,
-                                    label: 'Export PNG',
-                                    action: exportCanvasPNG
-                                }}
-                            />
-                            <TextToolButton
-                                tool={{
-                                    id: 'export-svg',
-                                    icon: Box,
-                                    label: 'Export SVG',
-                                    action: exportCanvasSVG
-                                }}
-                            />
-                            <TextToolButton
-                                tool={{
-                                    id: 'export-pdf',
-                                    icon: FileText,
-                                    label: 'Export PDF',
-                                    action: exportCanvasPDF
+                                    id: 'export',
+                                    icon: Download,
+                                    label: 'Export...',
+                                    action: () => setShowExportModal(true)
                                 }}
                             />
                             <TextToolButton
@@ -497,6 +485,14 @@ const Toolbar = () => {
                 <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={undo} title="Undo"><Undo size={iconSize} /></button>
                 <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={redo} title="Redo"><Redo size={iconSize} /></button>
                 <Divider />
+                <button
+                    className={`glass-button ${isLight ? 'light-icons' : ''} ${showSavedItemsPanel ? 'active' : ''}`}
+                    onClick={() => setShowSavedItemsPanel(!showSavedItemsPanel)}
+                    title="Saved Items (Shift+S)"
+                >
+                    <Package size={iconSize} />
+                </button>
+                <div style={{ width: 1, height: 24, background: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }} />
                 <button className={`glass-button ${isLight ? 'light-icons' : ''}`} onClick={() => setShowSettingsSidebar(true)} title="Settings"><Settings2 size={iconSize} /></button>
                 <button
                     className={`glass-button ${isLight ? 'light-icons' : ''} ${settings?.focusMode ? 'active' : ''}`}
