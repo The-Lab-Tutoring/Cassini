@@ -88,6 +88,7 @@ Contact via the info below (*@beaumontusd.k12.ca.us* addresses can only be conta
 
 - Caden D. Erwin --> <cerwin42451@beaumontusd.k12.ca.us> / <cerwinbhs@icloud.com>
 - Jayden R. McCarthy --> <jmccarthy35750@beaumontusd.k12.ca.us>
+- Discord --> [CLICK ME!](discord.gg/8ur5uuS84q)
 
 *Date of Last Revision: January 6, 2026*
 
