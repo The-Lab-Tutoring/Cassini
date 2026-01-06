@@ -71,4 +71,7 @@ For a detailed list of changes and version history, please see:
 
 ---
 
-Built with ❤️ by **Orama Technologies**
+Contact via the info below (*@beaumontusd.k12.ca.us* addresses can only be contacted by emails ending in *@beaumontusd.k12.ca.us*):
+
+- Caden D. Erwin --> cerwin42451@beaumontusd.k12.ca.us / cerwinbhs@icloud.com
+- Jayden R. McCarthy --> jmccarthy35750@beaumontusd.k12.ca.us

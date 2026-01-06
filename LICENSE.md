@@ -1,8 +1,10 @@
 # Cassini Software License Agreement (CSLA)
-## Version 2.0 - December 31, 2025
+
+## Version 2.1 - January 6, 2026
+
 ### Personal Use Grant with Commercial Restriction
 
-**Copyright (c) 2025-2026; Orama, Cassini, Caden D. Erwin, Jayden R. McCarthy. All Rights Reserved.**
+**Copyright (c) 2026; Orama & Cassini by Caden D. Erwin & Jayden R. McCarthy. All Rights Reserved.**
 
 ---
 
@@ -10,7 +12,7 @@
 
 **1.1. "Software"** refers to the original software product named "Cassini," including all its components, associated documentation, source code, object code, and any future updates or modifications provided by the Licensor.
 
-**1.2. "Licensor"** refers to the copyright holders: Orama, Cassini, Caden D. Erwin, and Jayden R. McCarthy.
+**1.2. "Licensor"** refers to the copyright holders: Orama & Cassini by Caden D. Erwin & Jayden R. McCarthy.
 
 **1.3. "Licensee"** refers to the individual or entity obtaining and using the Software under the terms of this Agreement.
 
@@ -72,12 +74,21 @@ IN NO EVENT SHALL THE LICENSOR, AUTHORS, OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
 
 **9.3. Severability.** If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions will remain in full force and effect.
 
-### 10. Contact and Inquiries
+### 10. Orama Tutoring Services
+
+**10.1. Mandatory Agreement.** All individuals who book in-person or online sessions with Orama (operating as a tutoring service) are required to agree to and be bound by the terms of this Cassini Software License Agreement (CSLA), regardless of whether their specific tutor utilizes the Software during the session.
+
+### 11. Contact and Inquiries
 
 Any questions, inquiries regarding this license, or requests for **Commercial Authorization** must be sent to:
 
-**Orama, Cassini, Caden D. Erwin, Jayden R. McCarthy**
+**Caden D. Erwin & Jayden R. McCarthy**
 
-Contact via the official GitHub repository or the designated contact method provided on [Orama's Website](https://oramaatbhs.my.canva.site/).
+Contact via the info below (*@beaumontusd.k12.ca.us* addresses can only be contacted by emails ending in *@beaumontusd.k12.ca.us*):
 
-*Date of Last Revision: December 31, 2025*
+- Caden D. Erwin --> <cerwin42451@beaumontusd.k12.ca.us> / <cerwinbhs@icloud.com>
+- Jayden R. McCarthy --> <jmccarthy35750@beaumontusd.k12.ca.us>
+
+*Date of Last Revision: January 6, 2026*
+
+#### *Orama is an informal, student-run tutoring service that is not a club, company, or official organization, but operates in alignment with Beaumont Unified School District and Beaumont High School policies. If Orama ever transitions to a paid model, any payments will go directly to individual tutors and not to Orama as an entity. Orama does not function as a nonprofit corporation or registered organization of any kind.*
