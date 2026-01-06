@@ -404,7 +404,13 @@ const Toolbar = () => {
                                     id: 'save',
                                     icon: Save,
                                     label: 'Save',
-                                    action: () => saveWhiteboard({ elements, background, viewport, author: settings.userName }, 'whiteboard')
+                                    action: () => saveWhiteboard({
+                                        version: '1.8.0',
+                                        elements,
+                                        background,
+                                        viewport,
+                                        author: settings.userName
+                                    }, 'whiteboard')
                                 }}
                             />
                             <div style={{ position: 'relative' }}>

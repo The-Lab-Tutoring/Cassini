@@ -337,6 +337,7 @@ export const WhiteboardProvider = ({ children }) => {
         autoSaveRef.current = setInterval(() => {
             if (elements.length > 0) {
                 const saveData = {
+                    version: '1.8.0',
                     elements,
                     background,
                     viewport,

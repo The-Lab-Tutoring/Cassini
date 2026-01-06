@@ -23,6 +23,7 @@
 - **Shape Rendering**: Resolved a critical `ReferenceError: drawShape is not defined` that occurred when attempting to draw shapes or use the laser pointer.
 - **Rendering Refactor**: Successfully migrated the "current shape" and "ephemeral strokes" (laser) logic to the unified `drawElement` architecture, ensuring consistent and stable canvas performance.
 - **Export Stability**: Fixed a critical crash (`TypeError: length of undefined`) when opening the Export Modal by synchronizing the `selectedElements` state with the global Whiteboard Context.
+- **JSON**: Fixed an issue where the `saveWhiteboard` function was not saving the correct version of the whiteboard.
 
 ### 🏷️ 2026 Versioning Standard
 
