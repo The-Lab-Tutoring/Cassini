@@ -76,7 +76,7 @@ IN NO EVENT SHALL THE LICENSOR, AUTHORS, OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
 
 ### 10. Orama Tutoring Services
 
-**10.1. Mandatory Agreement.** All individuals who book in-person or online sessions with Orama (operating as a tutoring service) are required to agree to and be bound by the terms of this Cassini Software License Agreement (CSLA), regardless of whether their specific tutor utilizes the Software during the session.
+**10.1. Mandatory Agreement.** Everyone who schedules in-person or online sessions with Orama (functioning as a tutoring service), installs the software, accesses the software through the web app (Vercel, at *orama-cassini.vercel.app*), or uses it from someone else's device must agree to and comply with the terms of this Cassini Software License Agreement (CSLA), whether or not their particular tutor uses the Software during the session.
 
 ### 11. Contact and Inquiries
 
